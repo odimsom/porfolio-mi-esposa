@@ -14,6 +14,7 @@ import type Studies from '../../core/entities/Studies';
 import type Project from '../../core/entities/Projects';
 import type Skill from '../../core/entities/Skils';
 import type CertificateAndCourse from '../../core/entities/CertificatesAndCources';
+import type Person from '../../core/entities/Person';
 
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { DetailModalComponent, type EntityType, type ModalMode } from '../../components/detail-modal/detail-modal.component';
@@ -25,6 +26,7 @@ import { StudiesService } from '../../services/studies.service';
 import { ProjectService } from '../../services/project.service';
 import { SkillService } from '../../services/skill.service';
 import { CertificateService } from '../../services/certificate.service';
+import { PersonService } from '../../services/person.service';
 
 // Mocks removed
 
@@ -59,6 +61,7 @@ export class PortfolioPage implements OnInit, OnDestroy {
     private projectService = inject(ProjectService);
     private skillService = inject(SkillService);
     private certificateService = inject(CertificateService);
+    private personService = inject(PersonService);
     private router = inject(Router); // Inject Router
 
     isAdmin = computed(() => this.authService.isAuthenticated());
@@ -71,6 +74,7 @@ export class PortfolioPage implements OnInit, OnDestroy {
     projects = signal<Project[]>([]);
     skills = signal<Skill[]>([]);
     certificates = signal<CertificateAndCourse[]>([]);
+    person = signal<Person | null>(null);
 
     activeFilter = signal<FeedFilter>('all');
     searchQuery = signal('');
@@ -142,7 +146,7 @@ export class PortfolioPage implements OnInit, OnDestroy {
         return this.feedItems().slice(start, start + this.ITEMS_PER_PAGE);
     });
     pageNumbers = computed(() => Array.from({ length: this.totalPages() }, (_: unknown, i: number) => i));
-    location = computed(() => this.blogs()[0]?.Location ?? 'Guayaquil, Ecuador');
+    location = computed(() => this.person()?.Location ?? 'Guayaquil, Ecuador');
 
     constructor() {
         effect(() => {
@@ -171,6 +175,11 @@ export class PortfolioPage implements OnInit, OnDestroy {
         this.projectService.getAll().subscribe(res => { if(res.success) this.projects.set(res.data || []); });
         this.skillService.getAll().subscribe(res => { if(res.success) this.skills.set(res.data || []); });
         this.certificateService.getAll().subscribe(res => { if(res.success) this.certificates.set(res.data || []); });
+        this.personService.getAll().subscribe(res => { 
+            if(res.success && res.data && res.data.length > 0) {
+                this.person.set(res.data[0]); // Take the first person found
+            }
+        });
     }
 
     ngOnDestroy(): void {
@@ -256,6 +265,7 @@ export class PortfolioPage implements OnInit, OnDestroy {
             case 'project': service = this.projectService; break;
             case 'skill': service = this.skillService; break;
             case 'certificate': service = this.certificateService; break;
+            case 'person': service = this.personService; break;
         }
 
         if (!service) return;
@@ -269,7 +279,19 @@ export class PortfolioPage implements OnInit, OnDestroy {
             });
         } else if (mode === 'edit') {
             const id = data._id || data.id; // Support both _id and id
-            if (!id) return;
+            if (!id) {
+                // Special case for Person if it doesn't exist yet but we are "editing" (conceptually creating via edit form)
+                if (type === 'person') {
+                     service.create(data).subscribe((res: any) => {
+                        if (res.success) {
+                            this.loadData();
+                            this.closeModal();
+                        }
+                    });
+                    return;
+                }
+                return;
+            }
             service.update(id, data).subscribe((res: any) => {
                  if (res.success) {
                     this.loadData();
@@ -290,6 +312,7 @@ export class PortfolioPage implements OnInit, OnDestroy {
             case 'project': service = this.projectService; break;
             case 'skill': service = this.skillService; break;
             case 'certificate': service = this.certificateService; break;
+            case 'person': service = this.personService; break;
         }
 
         if (service && (item._id || item.id)) {
