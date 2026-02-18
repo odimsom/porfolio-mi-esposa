@@ -1,0 +1,48 @@
+<div class="login-container">
+    <div class="login-box">
+        <h1>🔐 Acceso Admin</h1>
+        <p class="subtitle">Portfolio Management</p>
+        
+        <form (ngSubmit)="onSubmit()">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input 
+                    type="email" 
+                    id="email"
+                    [ngModel]="email()"
+                    (ngModelChange)="email.set($event)"
+                    name="email"
+                    placeholder="tu@email.com"
+                    autocomplete="email"
+                />
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input 
+                    type="password" 
+                    id="password"
+                    [ngModel]="password()"
+                    (ngModelChange)="password.set($event)"
+                    name="password"
+                    placeholder="••••••••"
+                    autocomplete="current-password"
+                />
+            </div>
+            
+            @if (error()) {
+                <div class="error-message">{{ error() }}</div>
+            }
+            
+            <button type="submit" class="login-btn" [disabled]="loading()">
+                @if (loading()) {
+                    Cargando...
+                } @else {
+                    Iniciar Sesión
+                }
+            </button>
+        </form>
+        
+        <button class="back-btn" (click)="goBack()">← Volver al Portfolio</button>
+    </div>
+</div>

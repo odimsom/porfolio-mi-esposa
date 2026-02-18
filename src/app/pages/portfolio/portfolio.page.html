@@ -1,0 +1,91 @@
+<div class="portfolio-container">
+    <!-- Admin controls -->
+    @if (isAdmin()) {
+        <div class="admin-bar">
+            <span>Modo Admin</span>
+            <button class="logout-btn" (click)="logout()">Cerrar Sesión</button>
+        </div>
+    }
+
+    <div class="grid-layout">
+        <!-- Section 3: Left sidebar -->
+        <section class="section section-3">
+            <div class="section-header">
+                <h2>Sección 3</h2>
+                @if (isAdmin()) {
+                    <app-add-button (click)="onAdd('section3')" />
+                }
+            </div>
+            <div class="cards-container">
+                @for (item of section3Items(); track item.index) {
+                    <app-generic-card 
+                        [data]="item" 
+                        [showControls]="isAdmin()"
+                        (edit)="onEdit('section3', item)"
+                        (delete)="onDelete('section3', item)"
+                    />
+                }
+            </div>
+        </section>
+
+        <!-- Section 4: Top bar -->
+        <section class="section section-4">
+            <div class="section-header">
+                <h2>Sección 4</h2>
+                @if (isAdmin()) {
+                    <app-add-button (click)="onAdd('section4')" />
+                }
+            </div>
+            <div class="cards-container horizontal">
+                @for (item of section4Items(); track item.index) {
+                    <app-generic-card 
+                        [data]="item" 
+                        [showControls]="isAdmin()"
+                        (edit)="onEdit('section4', item)"
+                        (delete)="onDelete('section4', item)"
+                    />
+                }
+            </div>
+        </section>
+
+        <!-- Section 1: Center main -->
+        <section class="section section-1">
+            <div class="section-header">
+                <h2>Sección 1</h2>
+                @if (isAdmin()) {
+                    <app-add-button (click)="onAdd('section1')" />
+                }
+            </div>
+            <div class="cards-container">
+                @for (item of section1Items(); track item.index) {
+                    <app-generic-card 
+                        [data]="item" 
+                        [showControls]="isAdmin()"
+                        (edit)="onEdit('section1', item)"
+                        (delete)="onDelete('section1', item)"
+                    />
+                }
+            </div>
+        </section>
+
+        <!-- Section 5: Right sidebar -->
+        <section class="section section-5">
+            <div class="section-header">
+                <h2>Sección 5</h2>
+                @if (isAdmin()) {
+                    <app-add-button (click)="onAdd('section5')" />
+                }
+            </div>
+            <div class="cards-container">
+                @for (item of section5Items(); track item.index) {
+                    <app-generic-card 
+                        [data]="item" 
+                        [showControls]="isAdmin()"
+                        (edit)="onEdit('section5', item)"
+                        (delete)="onDelete('section5', item)"
+                    />
+                }
+            </div>
+        </section>
+    </div>
+</div>
