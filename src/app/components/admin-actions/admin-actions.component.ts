@@ -1,5 +1,5 @@
 
-import { Component, inject, output } from '@angular/core';
+import { Component, computed, input, inject, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd } from '@angular/router';
 import { filter, map, startWith } from 'rxjs/operators';
@@ -21,13 +21,12 @@ import { toSignal } from '@angular/core/rxjs-interop';
   `,
   styles: [`
     .admin-toolbar {
+        position: absolute;
+        bottom: 1.5rem;
+        right: 1.5rem;
+        z-index: 100;
         display: flex;
-        justify-content: center; /* Center buttons */
         gap: 0.8rem;
-        padding: 0.5rem;
-        margin-bottom: 1rem;
-        position: relative;
-        z-index: 10;
     }
     .add-btn {
         background: rgba(116, 185, 255, 0.15);
@@ -61,6 +60,7 @@ import { toSignal } from '@angular/core/rxjs-interop';
 export class AdminActionsComponent {
   private router = inject(Router);
   create = output<string>();
+  currentFilter = input<string | null>(null);
 
   // Observable of current URL
   private url$ = this.router.events.pipe(
@@ -71,19 +71,18 @@ export class AdminActionsComponent {
 
   private currentUrl = toSignal(this.url$, { initialValue: this.router.url });
 
-  // Route Logic
-  showBlog = () => this.checkRoute('blogs');
-  showProject = () => this.checkRoute('projects');
-  showExperience = () => this.checkRoute('experience');
-  showStudies = () => this.checkRoute('studies');
-  showSkills = () => this.checkRoute('skills');
-  showCertificates = () => this.checkRoute('certificates');
+  // Route Logic - Now checks BOTH URL and Input Filter
+  showBlog = computed(() => this.checkRoute('blogs') || this.currentFilter() === 'blogs');
+  showProject = computed(() => this.checkRoute('projects') || this.currentFilter() === 'projects');
+  showExperience = computed(() => this.checkRoute('experience') || this.currentFilter() === 'experience');
+  showStudies = computed(() => this.checkRoute('studies') || this.currentFilter() === 'studies');
+  showSkills = computed(() => this.checkRoute('skills') || this.currentFilter() === 'skills');
+  showCertificates = computed(() => this.checkRoute('certificates') || this.currentFilter() === 'certificates');
 
   private checkRoute(segment: string): boolean {
     const url = this.currentUrl().toLowerCase();
-    // "/admin/todos" shows EVERYTHING
+    
     // Strict Context: ONLY show if specific segment matches
-    // Removed "Todos/Overview" check so buttons don't appear in dashboard view
     if (url.includes('/admin/todos') || url === '/admin') return false;
     
     // Specific match

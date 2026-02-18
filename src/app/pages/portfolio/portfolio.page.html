@@ -35,7 +35,10 @@
         <div class="feed-view fade-in">
            <!-- Admin Add Buttons for Feed -->
            @if (isAdmin()) {
-             <app-admin-actions (create)="openModal($any($event), 'create')" />
+             <app-admin-actions 
+               [currentFilter]="activeFilter()"
+               (create)="openModal($any($event), 'create')" 
+              />
            }
 
           <div class="feed-grid">
@@ -121,7 +124,13 @@
       </div>
 
        <!-- Admin Add Buttons for Sidebar -->
-       <!-- Admin Add Buttons for Sidebar (Now handled by contextual AdminActions in main view) -->
+       <!-- Admin Add Buttons for Sidebar -->
+       @if (isAdmin()) {
+         <app-admin-actions 
+           [currentFilter]="sidebarTab()"
+           (create)="openModal($any($event), 'create')" 
+          />
+       }
 
       <!-- Tab content -->
       <div class="sidebar-scroll dark-scrollbar">

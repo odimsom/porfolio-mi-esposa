@@ -122,6 +122,7 @@
     flex-direction: column;
     height: 100%;
     animation: slideIn 0.4s ease-out;
+    position: relative; /* Context for absolute admin buttons */
 }
 
 .feed-grid {
