@@ -1,391 +1,401 @@
-import { Component, input, output, signal, effect, computed } from '@angular/core';
+import { Component, input, output, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { DragDropModule } from '@angular/cdk/drag-drop';
 import type Blog from '../../core/entities/Blogs';
 import type Project from '../../core/entities/Projects';
-import type Experience from '../../core/entities/Experience';
-import type Studies from '../../core/entities/Studies';
-import type Skill from '../../core/entities/Skils';
-import type CertificateAndCourse from '../../core/entities/CertificatesAndCources';
 
-export type EntityType = 'blog' | 'project' | 'experience' | 'studies' | 'skill' | 'certificate';
-export type ModalMode = 'view' | 'edit' | 'create';
+export type EntityType = 'blog' | 'experience' | 'studies' | 'project' | 'skill' | 'certificate' | 'person';
+export type ModalMode = 'view' | 'create' | 'edit';
 
 @Component({
-  selector: 'app-detail-modal',
-  standalone: true,
-  imports: [CommonModule, FormsModule],
-  template: `
-    <div class="modal-overlay" (click)="close.emit()">
-      <div class="modal-content glass-card" (click)="$event.stopPropagation()">
-        <!-- Header -->
-        <div class="modal-header">
-          <h2 class="modal-title">
-            @if (mode() === 'create') { New {{ type() | titlecase }} }
-            @else if (mode() === 'edit') { Edit {{ type() | titlecase }} }
-            @else { {{ item()?.Title }} }
-          </h2>
-          <button class="close-btn" (click)="close.emit()">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-          </button>
-        </div>
+    selector: 'app-detail-modal',
+    standalone: true,
+    imports: [CommonModule, ReactiveFormsModule, DragDropModule],
+    template: `
+        <div class="modal-overlay" (click)="close.emit()">
+            <div class="modal-container glass-card" (click)="$event.stopPropagation()">
+                
+                <!-- Close Button -->
+                <button class="close-btn" (click)="close.emit()">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
 
-        <!-- Body -->
-        <div class="modal-body dark-scrollbar">
-          
-          <!-- VIEW MODE -->
-          @if (mode() === 'view') {
-            <div class="view-content">
-              @if (item()?.Descriptions; as desc) {
-                <p class="description">{{ desc }}</p>
-              }
-              
-              <!-- Repo/Demo for Projects -->
-              @if (type() === 'project') {
-                <div class="links-row">
-                  @if (AsProject(item())?.Repository; as repo) {
-                    <a [href]="repo" target="_blank" class="chip chip--accent">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
-                      Repository
-                    </a>
-                  }
-                  @if (AsProject(item())?.Demo; as demo) {
-                    <a [href]="demo" target="_blank" class="chip chip--success">
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/></svg>
-                      Live Demo
-                    </a>
-                  }
+                <!-- Header -->
+                <div class="modal-header">
+                    <h2>
+                        {{ mode() === 'create' ? 'Nueva' : mode() === 'edit' ? 'Editar' : 'Detalle de' }} 
+                        {{ getEntityLabel() }}
+                    </h2>
                 </div>
-              }
 
-              <!-- Tags/Labels -->
-               @if (getLabels().length > 0) {
-                 <div class="labels-row">
-                   @for (label of getLabels(); track label) {
-                     <span class="chip">{{ label }}</span>
-                   }
-                 </div>
-               }
-            </div>
-          } 
-          
-          <!-- EDIT / CREATE MODE -->
-          @else {
-            <form (ngSubmit)="save()" class="edit-form">
-              <!-- Common: Title -->
-              <div class="form-group">
-                <label>Title</label>
-                <input type="text" [(ngModel)]="formData.Title" name="title" required class="glass-input">
-              </div>
+                <!-- Form (Create/Edit) -->
+                @if (mode() === 'create' || mode() === 'edit') {
+                    <form [formGroup]="form" (ngSubmit)="onSubmit()" class="modal-form">
+                        
+                        <!-- Common Fields -->
+                        @if (type() !== 'person') {
+                             <div class="form-group">
+                                <label>Título / Nombre</label>
+                                <input type="text" formControlName="Title" placeholder="Ej: Senior Frontend Dev">
+                            </div>
 
-              <!-- Common: Description -->
-              <div class="form-group">
-                <label>Description</label>
-                <textarea [(ngModel)]="formData.Descriptions" name="description" rows="4" class="glass-input"></textarea>
-              </div>
+                            <div class="form-group">
+                                <label>Descripción</label>
+                                <textarea formControlName="Descriptions" rows="4" placeholder="Describe los detalles..."></textarea>
+                            </div>
+                        }
 
-              <!-- Type Specific -->
-              @if (type() === 'project') {
-                <div class="form-group">
-                  <label>Repository URL</label>
-                  <input type="text" [(ngModel)]="formData.Repository" name="repository" class="glass-input">
-                </div>
-                <div class="form-group">
-                  <label>Demo URL</label>
-                  <input type="text" [(ngModel)]="formData.Demo" name="demo" class="glass-input">
-                </div>
-                <div class="form-group">
-                  <label>Labels (comma separated)</label>
-                  <input type="text" [ngModel]="formData.Labels?.join(', ')" (ngModelChange)="updateLabels($event)" name="labels" class="glass-input">
-                </div>
-              }
+                        <!-- Person Fields -->
+                        @if (type() === 'person') {
+                            <div class="form-group">
+                                <label>Nombre Completo</label>
+                                <input type="text" formControlName="Name" placeholder="Ej: Eva Nazareth">
+                            </div>
+                            <div class="form-group">
+                                <label>Título Profesional</label>
+                                <input type="text" formControlName="Title" placeholder="Ej: Frontend Developer">
+                            </div>
+                            <div class="form-group">
+                                <label>Biografía</label>
+                                <textarea formControlName="Descriptions" rows="4" placeholder="Breve biografía..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>Foto URL</label>
+                                <input type="text" formControlName="PhotoUrl" placeholder="https://...">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group half">
+                                    <label>Ubicación</label>
+                                    <input type="text" formControlName="Location" placeholder="Ej: Guayaquil, Ecuador">
+                                </div>
+                                <div class="form-group half">
+                                    <label>Email</label>
+                                    <input type="email" formControlName="Email" placeholder="correo@ejemplo.com">
+                                </div>
+                            </div>
+                             <div class="form-row">
+                                <div class="form-group half">
+                                    <label>GitHub URL</label>
+                                    <input type="text" formControlName="Github" placeholder="https://github.com/...">
+                                </div>
+                                <div class="form-group half">
+                                    <label>LinkedIn URL</label>
+                                    <input type="text" formControlName="Linkedin" placeholder="https://linkedin.com/in/...">
+                                </div>
+                            </div>
+                        }
 
-                @if (type() === 'blog') {
-                   <div class="form-group">
-                    <label>Tags (comma separated)</label>
-                    <input type="text" [ngModel]="formData.Tags?.join(', ')" (ngModelChange)="updateTags($event)" name="tags" class="glass-input">
-                  </div>
-                  <div class="form-group">
-                    <label>Location</label>
-                    <input type="text" [(ngModel)]="formData.Location" name="location" class="glass-input">
-                  </div>
-                  <div class="form-group">
-                    <label>Images (comma separated URLs)</label>
-                    <input type="text" [ngModel]="formData.ImgesUrls?.join(', ')" (ngModelChange)="updateImages($event)" name="images" class="glass-input">
-                  </div>
+
+                        @if (type() === 'blog') {
+                            <div class="form-group">
+                                <label>Tags (separados por coma)</label>
+                                <input type="text" [formControlName]="'tagsInput'" (blur)="parseTags()" placeholder="Angular, Design, UI">
+                            </div>
+                             <div class="form-group">
+                                <label>Imágenes URL (una por línea)</label>
+                                <textarea formControlName="imgsInput" (blur)="parseImgs()" rows="3" placeholder="https://..."></textarea>
+                            </div>
+                             <div class="form-row">
+                                <div class="form-group half">
+                                    <label>Fecha</label>
+                                    <input type="text" formControlName="Date" placeholder="Ej: Feb 2024">
+                                </div>
+                                <div class="form-group half">
+                                    <label>Ubicación</label>
+                                    <input type="text" formControlName="Location" placeholder="Ej: Remote">
+                                </div>
+                            </div>
+                        }
+
+                        @if (type() === 'experience' || type() === 'studies') {
+                            <div class="form-group">
+                                <label>{{ type() === 'experience' ? 'Empresa' : 'Universidad' }}</label>
+                                <input type="text" [formControlName]="type() === 'experience' ? 'Company' : 'University'" placeholder="Nombre de la institución">
+                            </div>
+                            <!-- Date handling -->
+                             <div class="form-row">
+                                <div class="form-group half">
+                                    <label>Fecha Inicio</label>
+                                    <input type="text" formControlName="DateStart" placeholder="Ej: 2020">
+                                </div>
+                                <div class="form-group half">
+                                    <label>Fecha Fin</label>
+                                    <input type="text" formControlName="DateEnd" placeholder="Ej: Presente">
+                                </div>
+                            </div>
+                            <div class="form-group checkbox">
+                                <label>
+                                    <input type="checkbox" formControlName="isCurrent">
+                                    Actualmente aquí
+                                </label>
+                            </div>
+                        }
+                        
+                        @if (type() === 'project') {
+                            <div class="form-group">
+                                <label>Labels/Tech (csv)</label>
+                                <input type="text" [formControlName]="'tagsInput'" (blur)="parseTags('Labels')" placeholder="React, Node, Mongo">
+                            </div>
+                             <div class="form-group">
+                                <label>Project URL</label>
+                                <input type="text" formControlName="Url" placeholder="https://...">
+                            </div>
+                        }
+                        
+                        @if (type() === 'skill') {
+                            <div class="form-group">
+                                <label>Icono (SVG Path o URL)</label>
+                                <input type="text" formControlName="Icon" placeholder="SVG path d='...'">
+                            </div>
+                        }
+
+                        <div class="form-actions">
+                            <button type="button" class="btn-cancel" (click)="close.emit()">Cancelar</button>
+                            <button type="submit" class="btn-save" [disabled]="form.invalid">Guardar</button>
+                        </div>
+                    </form>
+                } 
+                
+                <!-- View Mode -->
+                @else {
+                    <div class="view-content">
+                        <!-- Render view content based on type (simplified for now) -->
+                         <h3>{{ item()?.Title || item()?.Name }}</h3>
+                         <p class="view-desc">{{ item()?.Descriptions }}</p>
+                         
+                         <!-- Add more specific view details if needed -->
+                    </div>
                 }
 
-              <!-- Experience/Studies Dates -->
-               @if (type() === 'experience' || type() === 'studies' || type() === 'certificate') {
-                  <div class="form-row">
-                    <div class="form-group">
-                        <label>Start</label>
-                        <input type="text" [(ngModel)]="formData.Start" name="start" class="glass-input" placeholder="YYYY or Month YYYY">
-                    </div>
-                    <div class="form-group">
-                        <label>End</label>
-                        <input type="text" [(ngModel)]="formData.End" name="end" class="glass-input" placeholder="Present or date">
-                    </div>
-                  </div>
-                  @if (type() === 'experience') {
-                      <div class="form-group">
-                          <label>Company</label>
-                          <input type="text" [(ngModel)]="formData.Company" name="company" class="glass-input">
-                      </div>
-                  }
-                  @if (type() === 'studies') {
-                      <div class="form-group">
-                          <label>University</label>
-                          <input type="text" [(ngModel)]="formData.University" name="university" class="glass-input">
-                      </div>
-                  }
-               }
-
-               @if (type() === 'skill') {
-                  <div class="form-group">
-                      <label>Type (Frontend, Backend, etc.)</label>
-                      <input type="text" [(ngModel)]="formData.Type" name="skillType" class="glass-input">
-                  </div>
-               }
-
-              <div class="form-actions">
-                <button type="submit" class="btn-save">Save</button>
-                <button type="button" class="btn-cancel" (click)="close.emit()">Cancel</button>
-              </div>
-            </form>
-          }
+            </div>
         </div>
-      </div>
-    </div>
-  `,
-  styles: [`
-    .modal-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(0, 0, 0, 0.6);
-      backdrop-filter: blur(5px);
-      z-index: 1000;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: fadeIn 0.2s ease-out;
-    }
-
-    .modal-content {
-      width: 90%;
-      max-width: 600px;
-      max-height: 85vh;
-      display: flex;
-      flex-direction: column;
-      animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      background: rgba(30, 30, 30, 0.8) !important; 
-    }
-
-    .modal-header {
-      padding: 1.25rem;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .modal-title {
-      margin: 0;
-      font-family: 'Architects Daughter', cursive;
-      color: #f3f4f6;
-      font-size: 1.5rem;
-      letter-spacing: 0.05em;
-    }
-
-    .close-btn {
-      background: transparent;
-      border: none;
-      color: #9ca3af;
-      cursor: pointer;
-      display: flex;
-      padding: 4px;
-      border-radius: 50%;
-      transition: all 0.2s;
-    }
-    .close-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
-
-    .modal-body {
-      padding: 1.5rem;
-      overflow-y: auto;
-      flex: 1;
-    }
-
-    .view-content {
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
-      color: #d1d5db;
-    }
-
-    .description {
-        white-space: pre-wrap;
-        line-height: 1.6;
-        font-size: 1rem;
-    }
-
-    .links-row {
-        display: flex;
-        gap: 1rem;
-        flex-wrap: wrap;
-    }
-
-    .labels-row {
-        display: flex;
-        gap: 0.5rem;
-        flex-wrap: wrap;
-        margin-top: 0.5rem;
-    }
-
-    .chip {
-        padding: 0.3rem 0.8rem;
-        border-radius: 99px;
-        font-size: 0.8rem;
-        background: rgba(255,255,255,0.1);
-        color: #e5e7eb;
-        text-decoration: none;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.4rem;
-        transition: all 0.2s;
-    }
-    .chip:hover {
-        background: rgba(255,255,255,0.2);
-    }
-    .chip--accent { border: 1px solid #a29bfe; color: #a29bfe; background: rgba(162, 155, 254, 0.1); }
-    .chip--success { border: 1px solid #00b894; color: #00b894; background: rgba(0, 184, 148, 0.1); }
-
-    /* FORM STYLES */
-    .edit-form {
-        display: flex;
-        flex-direction: column;
-        gap: 1.25rem;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-    }
-    
-    .form-row {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 1rem;
-    }
-
-    label {
-        font-size: 0.85rem;
-        color: #9ca3af;
-        margin-left: 0.25rem;
-    }
-
-    .glass-input {
-        background: rgba(0, 0, 0, 0.3);
-        border: 1px solid rgba(255, 255, 255, 0.1);
-        border-radius: 12px;
-        padding: 0.8rem 1rem;
-        color: #fff;
-        font-family: inherit;
-        font-size: 0.95rem;
-        transition: all 0.2s;
-    }
-    .glass-input:focus {
-        outline: none;
-        border-color: #74b9ff;
-        background: rgba(0, 0, 0, 0.5);
-    }
-    textarea.glass-input {
-        resize: vertical;
-        min-height: 100px;
-    }
-
-    .form-actions {
-        display: flex;
-        gap: 1rem;
-        margin-top: 1rem;
-        justify-content: flex-end;
-    }
-
-    .btn-save {
-        background: #00b894;
-        color: #fff;
-        border: none;
-        padding: 0.75rem 1.5rem;
-        border-radius: 12px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    .btn-save:hover { background: #00a884; transform: translateY(-1px); }
-
-    .btn-cancel {
-        background: transparent;
-        color: #d1d5db;
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        padding: 0.75rem 1.5rem;
-        border-radius: 12px;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
-    .btn-cancel:hover { background: rgba(255, 255, 255, 0.05); }
-
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-  `]
+    `,
+    styles: [`
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        .modal-container {
+            width: 100%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            background: rgba(20, 20, 20, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .close-btn {
+            position: absolute;
+            top: 20px; right: 20px;
+            background: transparent;
+            border: none;
+            color: var(--color-text-secondary);
+            cursor: pointer;
+        }
+        .modal-header h2 {
+            margin-top: 0;
+            color: var(--color-text-primary);
+            font-family: var(--font-heading);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+        .form-group.half {
+            flex: 1;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--color-text-secondary);
+            font-size: 0.9rem;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            font-family: inherit;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--color-accent-primary);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .btn-cancel {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+        .btn-save {
+            background: var(--color-accent-primary);
+            border: none;
+            color: var(--color-bg-primary);
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .btn-save:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .view-content h3 {
+            color: var(--color-text-primary);
+            font-size: 1.5rem;
+        }
+        .view-desc {
+            color: var(--color-text-secondary);
+            line-height: 1.6;
+        }
+    `]
 })
 export class DetailModalComponent {
-  item = input<any>();
-  type = input.required<EntityType>();
-  mode = input.required<ModalMode>();
-  
-  close = output<void>();
-  saveItem = output<any>();
+    type = input.required<EntityType>();
+    mode = input.required<ModalMode>();
+    item = input<any>(null);
+    close = output<void>();
+    saveItem = output<any>();
 
-  // Mutable form data
-  formData: any = {};
+    fb = inject(FormBuilder);
+    form!: FormGroup;
 
-  constructor() {
-    effect(() => {
-        const it = this.item();
-        if (it) {
-            this.formData = JSON.parse(JSON.stringify(it)); // Deep copy
-        } else {
-            this.formData = {}; // New item
+    constructor() {
+        effect(() => {
+            this.initForm();
+        });
+    }
+
+    getEntityLabel(): string {
+        switch (this.type()) {
+            case 'blog': return 'Blog Post';
+            case 'experience': return 'Experiencia';
+            case 'studies': return 'Estudios';
+            case 'project': return 'Proyecto';
+            case 'skill': return 'Habilidad';
+            case 'certificate': return 'Certificado';
+            case 'person': return 'Perfil';
+            default: return 'Item';
         }
-    });
-  }
+    }
 
-  save() {
-      this.saveItem.emit(this.formData);
-  }
+    initForm() {
+        const item = this.item() || {};
+        const type = this.type();
 
-  updateLabels(val: string) {
-      this.formData.Labels = val.split(',').map(s => s.trim()).filter(s => s);
-  }
+        // Base fields
+        let group: any = {
+            Title: [item.Title || '', Validators.required],
+            Descriptions: [item.Descriptions || '', Validators.required],
+        };
 
-  updateTags(val: string) {
-      this.formData.Tags = val.split(',').map(s => s.trim()).filter(s => s);
-  }
+        if (type === 'person') {
+            group = { // Override for Person
+                Name: [item.Name || '', Validators.required],
+                Title: [item.Title || '', Validators.required],
+                Descriptions: [item.Descriptions || '', Validators.required],
+                PhotoUrl: [item.PhotoUrl || '', Validators.required],
+                Github: [item.Github || ''],
+                Linkedin: [item.Linkedin || ''],
+                Email: [item.Email || ''],
+                Location: [item.Location || '', Validators.required],
+            };
+        } else if (type === 'blog') {
+            group = {
+                ...group,
+                Date: [item.Date || ''],
+                Location: [item.Location || ''],
+                tagsInput: [item.Tags ? item.Tags.join(', ') : ''],
+                imgsInput: [item.ImgesUrls ? item.ImgesUrls.join('\\n') : '']
+            };
+        } else if (type === 'experience' || type === 'studies') {
+            group = {
+                ...group,
+                Company: [item.Company || ''],
+                University: [item.University || ''],
+                DateStart: [item.DateStart || ''],
+                DateEnd: [item.DateEnd || ''],
+                isCurrent: [item.states === 'current']
+            };
+        } else if (type === 'project') {
+             group = {
+                ...group,
+                Url: [item.Url || ''],
+                tagsInput: [item.Labels ? item.Labels.join(', ') : '']
+            };
+        } else if (type === 'skill') {
+             group = {
+                ...group,
+                Icon: [item.Icon || '']
+            };
+        }
 
-  updateImages(val: string) {
-      this.formData.ImgesUrls = val.split(',').map(s => s.trim()).filter(s => s);
-  }
+        // Add ID if editing
+        if (item._id || item.id) {
+            // we will merge it on submit, but good to know
+        }
 
-  // Type Guards for Template Helper
-  AsProject(val: any): Project | null { return this.type() === 'project' ? val as Project : null; }
+        this.form = this.fb.group(group);
+    }
 
-  getLabels(): string[] {
-      const t = this.type();
-      const i = this.item();
-      if (!i) return [];
-      if (t === 'project') return (i as Project).Labels || [];
-      if (t === 'blog') return (i as Blog).Tags || [];
-      if (t === 'experience' || t === 'studies') return (i as any).Labels || [];
-      return [];
-  }
+    parseTags(field: string = 'Tags') {
+        const val = this.form.get('tagsInput')?.value;
+        if (val) {
+             // Logic could be here, but we handle it on submit for simplicity in this reactive form
+        }
+    }
+    
+    parseImgs() {
+         // Logic could be here
+    }
+
+    onSubmit() {
+        if (this.form.invalid) return;
+        
+        const formVal = this.form.value;
+        const item = this.item() || {};
+        
+        // Final object preparation
+        let finalData = { ...item, ...formVal };
+
+        if (this.type() === 'blog') {
+            finalData.Tags = formVal.tagsInput ? formVal.tagsInput.split(',').map((t: string) => t.trim()) : [];
+            finalData.ImgesUrls = formVal.imgsInput ? formVal.imgsInput.split('\\n').map((l: string) => l.trim()).filter((l: string) => l) : [];
+        } else if (this.type() === 'project') {
+             finalData.Labels = formVal.tagsInput ? formVal.tagsInput.split(',').map((t: string) => t.trim()) : [];
+        } else if (this.type() === 'experience' || this.type() === 'studies') {
+             finalData.states = formVal.isCurrent ? 'current' : 'finished'; // Simple toggle for now
+        }
+
+        this.saveItem.emit(finalData);
+    }
 }
