@@ -182,6 +182,10 @@ export const MOCK_PROJECTS: Project[] = [
     Demo: 'https://taskflow-demo.vercel.app',
     Status: ProjectsStatus.Completed,
     Labels: ['Angular', 'Firebase', 'RxJS', 'Material UI'],
+    ImgesUrls: [
+      'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?w=800',
+      'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=800',
+    ],
   },
   {
     index: 2,
@@ -192,6 +196,9 @@ export const MOCK_PROJECTS: Project[] = [
     Demo: null,
     Status: ProjectsStatus.InProgress,
     Labels: ['React', 'D3.js', 'Node.js', 'PostgreSQL'],
+      ImgesUrls: [
+        'https://images.unsplash.com/photo-1581093588401-9c8e0b1a9f5c?w=800',
+      ],
   },
   {
     index: 3,
@@ -202,6 +209,10 @@ export const MOCK_PROJECTS: Project[] = [
     Demo: 'https://ecotrack.netlify.app',
     Status: ProjectsStatus.Completed,
     Labels: ['Next.js', 'TypeScript', 'Chart.js', 'Supabase'],
+    ImgesUrls: [
+      'https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=800',
+      'https://images.unsplash.com/photo-1491895200222-0fc4a4c35e18?w=800',
+    ],
   },
   {
     index: 4,
@@ -212,6 +223,9 @@ export const MOCK_PROJECTS: Project[] = [
     Demo: null,
     Status: ProjectsStatus.Planned,
     Labels: ['Vue.js', 'Python', 'OpenAI API', 'FastAPI'],
+    ImgesUrls: [
+      'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800',
+    ],
   },
 ];
 
