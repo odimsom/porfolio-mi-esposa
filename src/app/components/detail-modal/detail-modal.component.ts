@@ -4,6 +4,9 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { DragDropModule } from '@angular/cdk/drag-drop';
 import type Blog from '../../core/entities/Blogs';
 import type Project from '../../core/entities/Projects';
+import ProjectsStatus from '../../core/enums/projects_status';
+import SkillsTypes from '../../core/enums/skills_types';
+import TypeWorks from '../../core/enums/work_types';
 
 export type EntityType = 'blog' | 'experience' | 'studies' | 'project' | 'skill' | 'certificate' | 'person';
 export type ModalMode = 'view' | 'create' | 'edit';
@@ -47,6 +50,9 @@ export type ModalMode = 'view' | 'create' | 'edit';
                                 <label>Descripción</label>
                                 <textarea formControlName="Descriptions" rows="4" placeholder="Describe los detalles..."></textarea>
                             </div>
+                            
+                            <!-- Hidden Index -->
+                            <input type="hidden" formControlName="index">
                         }
 
                         <!-- Person Fields -->
@@ -93,11 +99,11 @@ export type ModalMode = 'view' | 'create' | 'edit';
                         @if (type() === 'blog') {
                             <div class="form-group">
                                 <label>Tags (separados por coma)</label>
-                                <input type="text" [formControlName]="'tagsInput'" (blur)="parseTags()" placeholder="Angular, Design, UI">
+                                <input type="text" [formControlName]="'tagsInput'" placeholder="Angular, Design, UI">
                             </div>
                              <div class="form-group">
                                 <label>Imágenes URL (una por línea)</label>
-                                <textarea formControlName="imgsInput" (blur)="parseImgs()" rows="3" placeholder="https://..."></textarea>
+                                <textarea formControlName="imgsInput" rows="3" placeholder="https://..."></textarea>
                             </div>
                              <div class="form-row">
                                 <div class="form-group half">
@@ -111,20 +117,20 @@ export type ModalMode = 'view' | 'create' | 'edit';
                             </div>
                         }
 
-                        @if (type() === 'experience' || type() === 'studies') {
+                        @if (type() === 'experience' || type() === 'studies' || type() === 'certificate') {
                             <div class="form-group">
-                                <label>{{ type() === 'experience' ? 'Empresa' : 'Universidad' }}</label>
+                                <label>{{ type() === 'experience' ? 'Empresa' : 'Universidad / Institución' }}</label>
                                 <input type="text" [formControlName]="type() === 'experience' ? 'Company' : 'University'" placeholder="Nombre de la institución">
                             </div>
                             <!-- Date handling -->
                              <div class="form-row">
                                 <div class="form-group half">
                                     <label>Fecha Inicio</label>
-                                    <input type="text" formControlName="DateStart" placeholder="Ej: 2020">
+                                    <input type="text" formControlName="Start" placeholder="Ej: 2020">
                                 </div>
                                 <div class="form-group half">
                                     <label>Fecha Fin</label>
-                                    <input type="text" formControlName="DateEnd" placeholder="Ej: Presente">
+                                    <input type="text" formControlName="End" placeholder="Ej: Presente">
                                 </div>
                             </div>
                             <div class="form-group checkbox">
@@ -133,16 +139,44 @@ export type ModalMode = 'view' | 'create' | 'edit';
                                     Actualmente aquí
                                 </label>
                             </div>
+                             <div class="form-group">
+                                <label>Labels/Tech (csv)</label>
+                                <input type="text" [formControlName]="'tagsInput'" placeholder="React, Node, Mongo">
+                            </div>
                         }
                         
+                        @if (type() === 'experience') {
+                             <div class="form-group">
+                                <label>Tipo de Trabajo</label>
+                                <select formControlName="types" multiple class="multi-select">
+                                    @for (type of workTypes; track type) {
+                                        <option [value]="type">{{ type }}</option>
+                                    }
+                                </select>
+                                <small>Mantén presionado Ctrl para seleccionar varios</small>
+                            </div>
+                        }
+
                         @if (type() === 'project') {
                             <div class="form-group">
                                 <label>Labels/Tech (csv)</label>
-                                <input type="text" [formControlName]="'tagsInput'" (blur)="parseTags('Labels')" placeholder="React, Node, Mongo">
+                                <input type="text" [formControlName]="'tagsInput'" placeholder="React, Node, Mongo">
                             </div>
                              <div class="form-group">
                                 <label>Project URL</label>
-                                <input type="text" formControlName="Url" placeholder="https://...">
+                                <input type="text" formControlName="Demo" placeholder="https://...">
+                            </div>
+                            <div class="form-group">
+                                <label>Repository URL</label>
+                                <input type="text" formControlName="Repository" placeholder="https://github.com/...">
+                            </div>
+                             <div class="form-group">
+                                <label>Status</label>
+                                <select formControlName="Status">
+                                    @for (status of projectStatuses; track status) {
+                                        <option [value]="status">{{ status }}</option>
+                                    }
+                                </select>
                             </div>
                         }
                         
@@ -150,6 +184,14 @@ export type ModalMode = 'view' | 'create' | 'edit';
                             <div class="form-group">
                                 <label>Icono (SVG Path o URL)</label>
                                 <input type="text" formControlName="Icon" placeholder="SVG path d='...'">
+                            </div>
+                             <div class="form-group">
+                                <label>Tipo</label>
+                                <select formControlName="Type">
+                                    @for (type of skillTypes; track type) {
+                                        <option [value]="type">{{ type }}</option>
+                                    }
+                                </select>
                             </div>
                         }
 
@@ -228,7 +270,7 @@ export type ModalMode = 'view' | 'create' | 'edit';
             color: var(--color-text-secondary);
             font-size: 0.9rem;
         }
-        input, textarea {
+        input, textarea, select {
             width: 100%;
             padding: 12px;
             background: rgba(255, 255, 255, 0.05);
@@ -237,10 +279,19 @@ export type ModalMode = 'view' | 'create' | 'edit';
             color: white;
             font-family: inherit;
         }
-        input:focus, textarea:focus {
+        input:focus, textarea:focus, select:focus {
             outline: none;
             border-color: var(--color-accent-primary);
             background: rgba(255, 255, 255, 0.08);
+        }
+        /* Style for select options (browser dependent but dark bg helps) */
+        option {
+            background: #2d3436;
+            color: white;
+        }
+        .multi-select {
+            height: auto;
+            min-height: 100px;
         }
         .form-actions {
             display: flex;
@@ -277,6 +328,12 @@ export type ModalMode = 'view' | 'create' | 'edit';
             color: var(--color-text-secondary);
             line-height: 1.6;
         }
+        small {
+            color: var(--color-text-muted);
+            font-size: 0.8rem;
+            margin-top: 4px;
+            display: block;
+        }
     `]
 })
 export class DetailModalComponent {
@@ -288,6 +345,11 @@ export class DetailModalComponent {
 
     fb = inject(FormBuilder);
     form!: FormGroup;
+
+    // Enums for template
+    projectStatuses = Object.values(ProjectsStatus);
+    skillTypes = Object.values(SkillsTypes);
+    workTypes = Object.values(TypeWorks);
 
     constructor() {
         effect(() => {
@@ -312,10 +374,11 @@ export class DetailModalComponent {
         const item = this.item() || {};
         const type = this.type();
 
-        // Base fields
+        // Base fields Common
         let group: any = {
             Title: [item.Title || '', Validators.required],
             Descriptions: [item.Descriptions || '', Validators.required],
+            index: [item.index || 0] // Default index to 0
         };
 
         if (type === 'person') {
@@ -328,6 +391,7 @@ export class DetailModalComponent {
                 Linkedin: [item.Linkedin || ''],
                 Email: [item.Email || ''],
                 Location: [item.Location || '', Validators.required],
+                index: [item.index || 0]
             };
         } else if (type === 'blog') {
             group = {
@@ -337,45 +401,51 @@ export class DetailModalComponent {
                 tagsInput: [item.Tags ? item.Tags.join(', ') : ''],
                 imgsInput: [item.ImgesUrls ? item.ImgesUrls.join('\\n') : '']
             };
-        } else if (type === 'experience' || type === 'studies') {
+        } else if (type === 'experience') {
             group = {
                 ...group,
-                Company: [item.Company || ''],
-                University: [item.University || ''],
-                DateStart: [item.DateStart || ''],
-                DateEnd: [item.DateEnd || ''],
-                isCurrent: [item.states === 'current']
+                Company: [item.Company || '', Validators.required],
+                Start: [item.Start || '', Validators.required],
+                End: [item.End || ''],
+                isCurrent: [item.states === 'current'],
+                types: [item.types || []],
+                tagsInput: [item.Labels ? item.Labels.join(', ') : '']
+            };
+        } else if (type === 'studies') {
+            group = {
+                ...group,
+                University: [item.University || '', Validators.required],
+                Start: [item.Start || '', Validators.required],
+                End: [item.End || ''],
+                isCurrent: [item.states === 'current'],
+                tagsInput: [item.Labels ? item.Labels.join(', ') : '']
+            };
+        } else if (type === 'certificate') { // Handled like studies but check entity
+             group = {
+                ...group,
+                University: [item.University || '', Validators.required],
+                Start: [item.Start || '', Validators.required],
+                End: [item.End || ''],
+                isCurrent: [item.states === 'current'],
+                tagsInput: [item.Labels ? item.Labels.join(', ') : '']
             };
         } else if (type === 'project') {
              group = {
                 ...group,
-                Url: [item.Url || ''],
+                Demo: [item.Demo || ''],
+                Repository: [item.Repository || '', Validators.required],
+                Status: [item.Status || ProjectsStatus.Planned],
                 tagsInput: [item.Labels ? item.Labels.join(', ') : '']
             };
         } else if (type === 'skill') {
              group = {
                 ...group,
-                Icon: [item.Icon || '']
+                Icon: [item.Icon || ''],
+                Type: [item.Type || SkillsTypes.Other]
             };
         }
 
-        // Add ID if editing
-        if (item._id || item.id) {
-            // we will merge it on submit, but good to know
-        }
-
         this.form = this.fb.group(group);
-    }
-
-    parseTags(field: string = 'Tags') {
-        const val = this.form.get('tagsInput')?.value;
-        if (val) {
-             // Logic could be here, but we handle it on submit for simplicity in this reactive form
-        }
-    }
-    
-    parseImgs() {
-         // Logic could be here
     }
 
     onSubmit() {
@@ -387,14 +457,21 @@ export class DetailModalComponent {
         // Final object preparation
         let finalData = { ...item, ...formVal };
 
+        // Process Arrays and Specific Fields
         if (this.type() === 'blog') {
             finalData.Tags = formVal.tagsInput ? formVal.tagsInput.split(',').map((t: string) => t.trim()) : [];
             finalData.ImgesUrls = formVal.imgsInput ? formVal.imgsInput.split('\\n').map((l: string) => l.trim()).filter((l: string) => l) : [];
         } else if (this.type() === 'project') {
              finalData.Labels = formVal.tagsInput ? formVal.tagsInput.split(',').map((t: string) => t.trim()) : [];
-        } else if (this.type() === 'experience' || this.type() === 'studies') {
-             finalData.states = formVal.isCurrent ? 'current' : 'finished'; // Simple toggle for now
+        } else if (this.type() === 'experience' || this.type() === 'studies' || this.type() === 'certificate') {
+             finalData.states = formVal.isCurrent ? 'current' : 'past';
+             finalData.Labels = formVal.tagsInput ? formVal.tagsInput.split(',').map((t: string) => t.trim()) : [];
         }
+
+        // Clean up helper fields that are not in entity
+        delete finalData.tagsInput;
+        delete finalData.imgsInput;
+        delete finalData.isCurrent;
 
         this.saveItem.emit(finalData);
     }
