@@ -1,6 +1,0 @@
-[build]
-  command = "npm run build"
-  publish = "dist/porfolio-mi-esposa"
-
-[[plugins]]
-  package = "@netlify/plugin-angular"
