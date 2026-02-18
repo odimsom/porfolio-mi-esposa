@@ -386,6 +386,9 @@ export class FeedCardComponent implements OnInit, OnDestroy {
         if (it._type === 'blog') {
             return (it as Blog & { _type: 'blog' }).ImgesUrls ?? [];
         }
+        if (it._type === 'projects') {
+            return (it as Project & { _type: 'projects' }).ImgesUrls ?? [];
+        }
         return [];
     });
 

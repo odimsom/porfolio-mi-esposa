@@ -7,4 +7,5 @@ export default interface Project extends BaseEntity {
     Demo: string | null;
     Status: ProjectsStatus;
     Labels: string[];
+    ImgesUrls: string[];
 }

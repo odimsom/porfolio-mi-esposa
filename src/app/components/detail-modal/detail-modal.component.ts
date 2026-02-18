@@ -102,8 +102,8 @@ export type ModalMode = 'view' | 'create' | 'edit';
                                 <input type="text" [formControlName]="'tagsInput'" placeholder="Angular, Design, UI">
                             </div>
                              <div class="form-group">
-                                <label>Imágenes URL (una por línea)</label>
-                                <textarea formControlName="imgsInput" rows="3" placeholder="https://..."></textarea>
+                                <label>Imágenes URL (separadas por coma)</label>
+                                <textarea formControlName="imgsInput" rows="3" placeholder="https://..., https://..."></textarea>
                             </div>
                              <div class="form-row">
                                 <div class="form-group half">
@@ -161,6 +161,10 @@ export type ModalMode = 'view' | 'create' | 'edit';
                             <div class="form-group">
                                 <label>Labels/Tech (csv)</label>
                                 <input type="text" [formControlName]="'tagsInput'" placeholder="React, Node, Mongo">
+                            </div>
+                             <div class="form-group">
+                                <label>Imágenes URL (separadas por coma)</label>
+                                <textarea formControlName="imgsInput" rows="3" placeholder="https://..., https://..."></textarea>
                             </div>
                              <div class="form-group">
                                 <label>Project URL</label>
@@ -399,7 +403,7 @@ export class DetailModalComponent {
                 Date: [item.Date || ''],
                 Location: [item.Location || ''],
                 tagsInput: [item.Tags ? item.Tags.join(', ') : ''],
-                imgsInput: [item.ImgesUrls ? item.ImgesUrls.join('\\n') : '']
+                imgsInput: [item.ImgesUrls ? item.ImgesUrls.join(', ') : '']
             };
         } else if (type === 'experience') {
             group = {
@@ -435,7 +439,8 @@ export class DetailModalComponent {
                 Demo: [item.Demo || ''],
                 Repository: [item.Repository || '', Validators.required],
                 Status: [item.Status || ProjectsStatus.Planned],
-                tagsInput: [item.Labels ? item.Labels.join(', ') : '']
+                tagsInput: [item.Labels ? item.Labels.join(', ') : ''],
+                imgsInput: [item.ImgesUrls ? item.ImgesUrls.join(', ') : '']
             };
         } else if (type === 'skill') {
              group = {
@@ -460,9 +465,10 @@ export class DetailModalComponent {
         // Process Arrays and Specific Fields
         if (this.type() === 'blog') {
             finalData.Tags = formVal.tagsInput ? formVal.tagsInput.split(',').map((t: string) => t.trim()) : [];
-            finalData.ImgesUrls = formVal.imgsInput ? formVal.imgsInput.split('\\n').map((l: string) => l.trim()).filter((l: string) => l) : [];
+            finalData.ImgesUrls = formVal.imgsInput ? formVal.imgsInput.split(',').map((l: string) => l.trim()).filter((l: string) => l) : [];
         } else if (this.type() === 'project') {
              finalData.Labels = formVal.tagsInput ? formVal.tagsInput.split(',').map((t: string) => t.trim()) : [];
+             finalData.ImgesUrls = formVal.imgsInput ? formVal.imgsInput.split(',').map((l: string) => l.trim()).filter((l: string) => l) : [];
         } else if (this.type() === 'experience' || this.type() === 'studies' || this.type() === 'certificate') {
              finalData.states = formVal.isCurrent ? 'current' : 'past';
              finalData.Labels = formVal.tagsInput ? formVal.tagsInput.split(',').map((t: string) => t.trim()) : [];
