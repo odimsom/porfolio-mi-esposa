@@ -22,12 +22,15 @@ import { CommonModule } from '@angular/common';
     `,
     styles: [`
         .card {
-            background: white;
-            border: 2px solid #e5e5e5;
-            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px) saturate(120%);
+            -webkit-backdrop-filter: blur(15px) saturate(120%);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 16px;
             padding: 0.75rem;
             min-width: 120px;
             transition: all 0.2s ease;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
         
         .card.draggable {
@@ -35,20 +38,21 @@ import { CommonModule } from '@angular/common';
         }
         
         .card.draggable:hover {
-            border-color: #ec4899;
-            box-shadow: 0 2px 8px rgba(236, 72, 153, 0.2);
+            border-color: rgba(162, 155, 254, 0.4);
+            box-shadow: 0 4px 20px rgba(162, 155, 254, 0.15);
+            background: rgba(255, 255, 255, 0.1);
         }
         
         .card-content h3 {
             margin: 0 0 0.25rem 0;
             font-size: 0.875rem;
-            color: #333;
+            color: var(--color-text-primary);
         }
         
         .card-content p {
             margin: 0;
             font-size: 0.75rem;
-            color: #666;
+            color: var(--color-text-secondary);
             overflow: hidden;
             text-overflow: ellipsis;
             display: -webkit-box;
@@ -61,32 +65,34 @@ import { CommonModule } from '@angular/common';
             gap: 0.25rem;
             margin-top: 0.5rem;
             padding-top: 0.5rem;
-            border-top: 1px solid #eee;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
             align-items: center;
         }
         
         .edit-btn, .delete-btn {
-            background: none;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 8px;
             padding: 0.25rem 0.5rem;
             cursor: pointer;
             font-size: 0.75rem;
+            color: var(--color-text-secondary);
+            transition: all 0.2s ease;
         }
         
         .edit-btn:hover {
-            background: #fef3c7;
-            border-color: #f59e0b;
+            background: rgba(253, 203, 110, 0.15);
+            border-color: rgba(253, 203, 110, 0.3);
         }
         
         .delete-btn:hover {
-            background: #fee2e2;
-            border-color: #ef4444;
+            background: rgba(255, 118, 117, 0.15);
+            border-color: rgba(255, 118, 117, 0.3);
         }
         
         .drag-handle {
             margin-left: auto;
-            color: #999;
+            color: var(--color-text-muted);
             cursor: grab;
             font-weight: bold;
             letter-spacing: -2px;

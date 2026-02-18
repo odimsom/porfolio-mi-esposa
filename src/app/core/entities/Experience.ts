@@ -1,4 +1,4 @@
-import { TypeWorks } from "../enums";
+import TypeWorks from '../enums/work_types';
 import BaseEntity from "./base/BaseEntity";
 
 export default interface Experience extends BaseEntity {
