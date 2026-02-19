@@ -1,0 +1,8 @@
+<div class="admin-toolbar">
+     @if (showBlog()) { <button class="add-btn" (click)="create.emit('blog')">+ Blog</button> }
+     @if (showProject()) { <button class="add-btn" (click)="create.emit('project')">+ Project</button> }
+     @if (showExperience()) { <button class="add-btn" (click)="create.emit('experience')">+ Exp</button> }
+     @if (showStudies()) { <button class="add-btn" (click)="create.emit('studies')">+ Edu</button> }
+     @if (showSkills()) { <button class="add-btn" (click)="create.emit('skill')">+ Skill</button> }
+     @if (showCertificates()) { <button class="add-btn" (click)="create.emit('certificate')">+ Cert</button> }
+</div>
