@@ -28,15 +28,14 @@
         (filterChange)="onFilterChange($event)"
         (searchChange)="onSearchChange($event)"
         (contactClick)="goToContact()"
+        (downloadCVClick)="downloadCV()"
       />
     </section>
 
     <!-- Section 1: Main content area -->
     <section class="section section-feed glass-section">
       @if (activeView() === 'feed') {
-        <!-- Feed View -->
         <div class="feed-view fade-in">
-          <!-- Admin Add Buttons for Feed -->
           @if (isAdmin()) {
             <app-admin-actions
               [currentFilter]="activeFilter()"
@@ -170,7 +169,6 @@
 
     <!-- Section 5: Skills & Certificates - Right sidebar with auto-rotation -->
     <section class="section section-sidebar glass-section">
-      <!-- Tab buttons -->
       <div
         style="
           display: flex;

@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { NgxParticlesModule } from '@tsparticles/angular';
 import {
-  type Container,
   type ISourceOptions,
   MoveDirection,
   OutMode,
@@ -108,10 +107,6 @@ export class Background {
       },
     },
   };
-
-  particlesLoaded(container: Container): void {
-    console.log('Particles loaded', container);
-  }
 
   async particlesInit(engine: any): Promise<void> {
     await loadSlim(engine);
