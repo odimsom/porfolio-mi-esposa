@@ -1,5 +1,6 @@
-import { ChangeDetectionStrategy, Component, input, output, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Inject, input, output, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import Person from '../../core/entities/Person';
 
 export type FeedFilter = 'all' | 'blogs' | 'experience' | 'studies' | 'projects';
 
@@ -17,9 +18,10 @@ export class NavBarComponent {
     filterChange = output<FeedFilter>();
     searchChange = output<string>();
     contactClick = output<void>();
-
+    downloadCVClick = output<void>();
     activeFilter = signal<FeedFilter>('all');
     searchValue = signal('');
+
 
     selectFilter(filter: FeedFilter): void {
         this.activeFilter.set(filter);

@@ -18,7 +18,6 @@ export class IdentityPanelComponent {
     location = input<string>('Guayaquil, Ecuador');
     person = input<Person | null>(null);
     isAdmin = input<boolean>(false);
-    
     contactClick = output<void>();
     editProfile = output<void>();
 }

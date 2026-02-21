@@ -1,0 +1,85 @@
+<div class="skill-card glass-card">
+  <div class="skill-card__header">
+    <span class="skill-card__name">{{ skill().Title }}</span>
+    <span class="chip chip--accent">{{ skill().Type }}</span>
+  </div>
+  <p class="skill-card__desc">{{ skill().Descriptions }}</p>
+
+  <!-- Hover tooltip with certificates -->
+  <div class="skill-card__tooltip">
+    <div class="tooltip__arrow"></div>
+    <div class="tooltip__content glass-card">
+      <span class="tooltip__heading">Certificados relacionados</span>
+      @for (cert of skill().Hover; track $index) {
+        @if (cert) {
+          <div class="tooltip__cert">
+            <span class="tooltip__cert-title">{{ cert.Title }}</span>
+            <span class="tooltip__cert-uni">{{ cert.University }}</span>
+            <span class="tooltip__cert-date">
+              {{ cert.Start }} — {{ cert.End || 'Presente' }}
+            </span>
+            <span
+              class="chip"
+              [class.chip--success]="cert.states === 'current'"
+              [class.chip--warning]="cert.states === 'past'"
+            >
+              @if (cert.states === 'current') {
+                <span class="status-dot-inline status-dot-inline--active"></span>
+                En curso
+              } @else {
+                <svg
+                  width="10"
+                  height="10"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <polyline points="20 6 9 17 4 12" />
+                </svg>
+                Completado
+              }
+            </span>
+          </div>
+        }
+      }
+    </div>
+  </div>
+
+  @if (isAdmin()) {
+    <div class="skill-actions">
+      <button (click)="edit.emit()" class="mini-btn edit" title="Editar">
+        <svg
+          width="10"
+          height="10"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="3"
+        >
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
+        </svg>
+      </button>
+      <button (click)="delete.emit()" class="mini-btn delete" title="Eliminar">
+        <svg
+          width="10"
+          height="10"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="3"
+        >
+          <polyline points="3 6 5 6 21 6" />
+          <path
+            d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"
+          />
+          <line x1="10" y1="11" x2="10" y2="17" />
+          <line x1="14" y1="11" x2="14" y2="17" />
+        </svg>
+      </button>
+    </div>
+  }
+</div>

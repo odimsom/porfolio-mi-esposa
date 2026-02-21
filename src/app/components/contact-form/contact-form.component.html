@@ -1,0 +1,139 @@
+<div class="contact-wrapper fade-in">
+  <div class="contact-card glass-card">
+    <!-- Header -->
+    <div class="contact-header">
+      <button class="back-btn" (click)="backClick.emit()">
+        <svg
+          width="16"
+          height="16"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <line x1="19" y1="12" x2="5" y2="12" />
+          <polyline points="12 19 5 12 12 5" />
+        </svg>
+        Volver
+      </button>
+      <h2 class="contact-title">
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z" />
+          <polyline points="22,6 12,13 2,6" />
+        </svg>
+        Contacto
+      </h2>
+      <p class="contact-subtitle">¿Tienes un proyecto en mente? ¡Hablemos!</p>
+    </div>
+
+    @if (success()) {
+      <div class="success-box fade-in">
+        <div class="success-icon">
+          <svg
+            width="40"
+            height="40"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" />
+            <polyline points="22 4 12 14.01 9 11.01" />
+          </svg>
+        </div>
+        <h3>¡Mensaje enviado!</h3>
+        <p>Gracias por contactarme. Te responderé lo antes posible.</p>
+        <button class="btn-secondary" (click)="success.set(false)">Enviar otro mensaje</button>
+      </div>
+    } @else {
+      <form (ngSubmit)="onSubmit()" class="contact-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label for="cf-name">Nombre</label>
+            <input
+              type="text"
+              id="cf-name"
+              [ngModel]="name()"
+              (ngModelChange)="name.set($event)"
+              name="name"
+              placeholder="Tu nombre"
+            />
+          </div>
+          <div class="form-group">
+            <label for="cf-email">Email</label>
+            <input
+              type="email"
+              id="cf-email"
+              [ngModel]="email()"
+              (ngModelChange)="email.set($event)"
+              name="email"
+              placeholder="tu@email.com"
+            />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="cf-subject">Asunto</label>
+          <input
+            type="text"
+            id="cf-subject"
+            [ngModel]="subject()"
+            (ngModelChange)="subject.set($event)"
+            name="subject"
+            placeholder="¿De qué quieres hablar?"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="cf-message">Mensaje</label>
+          <textarea
+            id="cf-message"
+            [ngModel]="message()"
+            (ngModelChange)="message.set($event)"
+            name="message"
+            placeholder="Cuéntame sobre tu proyecto..."
+            rows="4"
+          ></textarea>
+        </div>
+
+        @if (error()) {
+          <div class="error-msg">{{ error() }}</div>
+        }
+
+        <button type="submit" class="btn-submit" [disabled]="loading()">
+          @if (loading()) {
+            <span class="spinner"></span> Enviando...
+          } @else {
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="22" y1="2" x2="11" y2="13" />
+              <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            </svg>
+            Enviar Mensaje
+          }
+        </button>
+      </form>
+    }
+  </div>
+</div>

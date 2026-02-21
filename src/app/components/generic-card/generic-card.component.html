@@ -1,0 +1,13 @@
+<div class="card" [class.draggable]="showControls()">
+  <div class="card-content">
+    <h3>{{ data().Title || 'Sin título' }}</h3>
+    <p>{{ data().Descriptions || 'Sin descripción' }}</p>
+  </div>
+  @if (showControls()) {
+    <div class="card-controls">
+      <button class="edit-btn" (click)="edit.emit()">Edit</button>
+      <button class="delete-btn" (click)="delete.emit()">Delete</button>
+      <span class="drag-handle">⋮⋮</span>
+    </div>
+  }
+</div>
