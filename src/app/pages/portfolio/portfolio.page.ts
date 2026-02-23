@@ -245,6 +245,9 @@ export class PortfolioPage implements OnInit, OnDestroy {
 
   onMobileSectionChange(section: MobileSection): void {
     this.activeMobileSection.set(section);
+    if (this.activeView() === 'contact') {
+      this.activeView.set('feed');
+    }
   }
 
   goToContact(): void {
