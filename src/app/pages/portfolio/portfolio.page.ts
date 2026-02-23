@@ -97,7 +97,7 @@ export class PortfolioPage implements OnInit, OnDestroy {
 
   ITEMS_PER_PAGE = computed(() => {
     if (this.isMobileWindow()) return 3;
-    if (this.isTabletWindow()) return 4;
+    if (this.isTabletWindow()) return 2;
     return 6;
   });
   
