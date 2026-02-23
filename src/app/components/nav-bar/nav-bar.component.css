@@ -30,6 +30,19 @@
 .filter-pills {
     display: flex;
     gap: 0.4rem;
+    overflow-x: auto;
+    flex-grow: 1;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+}
+.filter-pills::-webkit-scrollbar {
+    display: none;
+}
+.nav-actions {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    flex-shrink: 0;
 }
 .pill {
     display: flex;

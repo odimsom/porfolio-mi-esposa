@@ -43,7 +43,7 @@ import { PersonService } from '../../services/person.service';
 import { AdminActionsComponent } from '../../components/admin-actions/admin-actions.component';
 import { Router } from '@angular/router';
 import { MobileNavComponent, type MobileSection } from '../../components/mobile-nav/mobile-nav';
-import { FloatingActionsComponent } from '../../components/floating-actions/floating-actions';
+import { FloatingActionsComponent } from '../../components/floating-actions/floating-actions.component';
 
 @Component({
   selector: 'app-portfolio',

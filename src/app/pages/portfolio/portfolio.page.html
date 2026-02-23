@@ -22,7 +22,7 @@
     </section>
 
     <!-- Section 4: Navigation - Top bar -->
-    <section class="section section-nav glass-section" [class.mobile-hidden]="isMobileWindow() || isTabletWindow()">
+    <section class="section section-nav glass-section" [class.mobile-hidden]="isMobileWindow()">
       <app-nav-bar
         [isAdmin]="isAdmin()"
         (filterChange)="onFilterChange($event)"
@@ -301,10 +301,10 @@
     </section>
   </div>
 
-  @if (isMobileWindow() || isTabletWindow()) {
+  @if (isMobileWindow()) {
     <app-mobile-nav (sectionChange)="onMobileSectionChange($event)" />
   }
-  
+
   <app-floating-actions 
     (contactClick)="goToContact()"
     (downloadCVClick)="downloadCV()"
