@@ -42,6 +42,7 @@ import { PersonService } from '../../services/person.service';
 
 import { AdminActionsComponent } from '../../components/admin-actions/admin-actions.component';
 import { Router } from '@angular/router';
+import { MobileNavComponent, type MobileSection } from '../../components/mobile-nav/mobile-nav';
 
 @Component({
   selector: 'app-portfolio',
@@ -57,6 +58,7 @@ import { Router } from '@angular/router';
     DragDropModule,
     DetailModalComponent,
     AdminActionsComponent,
+    MobileNavComponent,
   ],
   templateUrl: './portfolio.page.html',
   styleUrl: './portfolio.page.css',
@@ -88,6 +90,9 @@ export class PortfolioPage implements OnInit, OnDestroy {
   activeFilter = signal<FeedFilter>('all');
   searchQuery = signal('');
 
+  activeMobileSection = signal<MobileSection>('profile');
+  isMobileWindow = signal<boolean>(false);
+
   readonly ITEMS_PER_PAGE = 4;
   currentPage = signal(0);
 
@@ -111,21 +116,28 @@ export class PortfolioPage implements OnInit, OnDestroy {
   feedItems = computed<FeedItem[]>(() => {
     const filter = this.activeFilter();
     const query = this.searchQuery().toLowerCase().trim();
+    const isMobile = this.isMobileWindow();
+    const mobileSection = this.activeMobileSection();
 
     let items: FeedItem[] = [];
 
-    if (filter === 'all' || filter === 'blogs') {
+    const showBlogs = isMobile ? mobileSection === 'blogs' : (filter === 'all' || filter === 'blogs');
+    const showExperience = isMobile ? mobileSection === 'experience' : (filter === 'all' || filter === 'experience');
+    const showStudies = isMobile ? mobileSection === 'studies' : (filter === 'all' || filter === 'studies');
+    const showProjects = isMobile ? mobileSection === 'projects' : (filter === 'all' || filter === 'projects');
+
+    if (showBlogs) {
       items.push(...this.blogs().map((b: Blog) => ({ ...b, _type: 'blog' as const })));
     }
-    if (filter === 'all' || filter === 'experience') {
+    if (showExperience) {
       items.push(
         ...this.experience().map((e: Experience) => ({ ...e, _type: 'experience' as const })),
       );
     }
-    if (filter === 'all' || filter === 'studies') {
+    if (showStudies) {
       items.push(...this.studies().map((s: Studies) => ({ ...s, _type: 'studies' as const })));
     }
-    if (filter === 'all' || filter === 'projects') {
+    if (showProjects) {
       items.push(...this.projects().map((p: Project) => ({ ...p, _type: 'projects' as const })));
     }
     if (query) {
@@ -165,9 +177,17 @@ export class PortfolioPage implements OnInit, OnDestroy {
   location = computed(() => this.person()?.Location ?? 'Guayaquil, Ecuador');
 
   constructor() {
+    if (typeof window !== 'undefined') {
+      this.isMobileWindow.set(window.innerWidth <= 768);
+      window.addEventListener('resize', () => {
+        this.isMobileWindow.set(window.innerWidth <= 768);
+      });
+    }
+
     effect(() => {
       this.activeFilter();
       this.searchQuery();
+      this.activeMobileSection();
       this.currentPage.set(0);
     });
   }
@@ -238,6 +258,10 @@ export class PortfolioPage implements OnInit, OnDestroy {
 
   onSearchChange(query: string): void {
     this.searchQuery.set(query);
+  }
+
+  onMobileSectionChange(section: MobileSection): void {
+    this.activeMobileSection.set(section);
   }
 
   goToContact(): void {

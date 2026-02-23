@@ -80,6 +80,30 @@
     height: calc(100vh - 2rem);
 }
 
+/* Mobile specific grid override */
+.grid-layout.mobile-layout {
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 2rem);
+    padding-bottom: 80px; /* Space for mobile nav */
+    gap: 1rem;
+    overflow-y: auto;
+}
+
+.section.mobile-hidden {
+    display: none !important;
+}
+
+.mobile-layout .section {
+    overflow: visible;
+    flex-shrink: 0;
+    height: auto;
+}
+
+.mobile-layout .feed-grid {
+    grid-template-columns: 1fr;
+}
+
 .section {
     overflow: hidden;
     position: relative;
