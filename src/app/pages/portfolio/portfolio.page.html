@@ -37,7 +37,7 @@
         <div class="feed-view fade-in">
           @if (isAdmin()) {
             <app-admin-actions
-              [currentFilter]="activeFilter()"
+              [currentFilter]="(isMobileWindow() || isTabletWindow()) ? activeMobileSection() : activeFilter()"
               (create)="openModal($any($event), 'create')"
             />
           }
