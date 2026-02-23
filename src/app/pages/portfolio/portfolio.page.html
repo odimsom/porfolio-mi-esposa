@@ -35,12 +35,6 @@
     <section class="section section-feed glass-section" [class.mobile-hidden]="isMobileWindow() && activeMobileSection() === 'profile' && activeView() !== 'contact'">
       @if (activeView() === 'feed') {
         <div class="feed-view fade-in">
-          @if (isAdmin()) {
-            <app-admin-actions
-              [currentFilter]="(isMobileWindow() || isTabletWindow()) ? activeMobileSection() : activeFilter()"
-              (create)="openModal($any($event), 'create')"
-            />
-          }
 
           <div class="feed-grid">
             @for (item of paginatedItems(); track $index) {
@@ -309,6 +303,13 @@
     (contactClick)="goToContact()"
     (downloadCVClick)="downloadCV()"
   />
+
+  @if (isAdmin() && activeView() === 'feed') {
+    <app-admin-actions
+      [currentFilter]="(isMobileWindow() || isTabletWindow()) ? activeMobileSection() : activeFilter()"
+      (create)="openModal($any($event), 'create')"
+    />
+  }
 
   <!-- DETAIL MODAL -->
   @if (isModalOpen()) {
