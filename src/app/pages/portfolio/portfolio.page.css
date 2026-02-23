@@ -397,3 +397,16 @@
 .sidebar-group.cdk-drop-list-dragging .sidebar-card:not(.cdk-drag-placeholder) {
     transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
+
+/* Mobile Admin Bar Override */
+@media (max-width: 768px) {
+    .admin-bar {
+        top: 15px;
+        bottom: auto;
+        left: 15px;
+        right: 15px;
+        justify-content: space-between;
+        padding: 8px 15px;
+        z-index: 9999;
+    }
+}
