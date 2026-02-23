@@ -149,21 +149,21 @@
    ============================================ */
 @media (min-width: 769px) and (max-width: 1060px) {
     .grid-layout {
-        grid-template-columns: 280px 1fr;
+        grid-template-columns: 320px 1fr;
         grid-template-areas:
             "sidebar nav"
             "sidebar content"
             "sidebar skills";
-        grid-template-rows: 80px auto 1fr;
+        grid-template-rows: 80px 1fr 280px;
     }
     
     .section-sidebar {
         grid-area: skills;
-        min-height: 400px;
+        min-height: auto;
     }
 
     .feed-grid {
-        grid-template-columns: 1fr; /* Single column feed on tablet is often better for readability */
+        grid-template-columns: 1fr 1fr;
     }
 }
 
