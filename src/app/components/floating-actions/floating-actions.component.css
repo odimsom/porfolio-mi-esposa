@@ -1,6 +1,6 @@
 .fab-container {
   position: fixed;
-  bottom: 85px; /* Above the mobile nav */
+  bottom: 110px; /* Fully clear the protruding mobile nav profile button */
   right: 15px;
   display: flex;
   flex-direction: column;
