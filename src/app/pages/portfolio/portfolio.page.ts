@@ -249,13 +249,26 @@ export class PortfolioPage implements OnInit, OnDestroy {
 
   goToContact(): void {
     this.activeView.set('contact');
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  goToFeed(): void {
+    this.activeView.set('feed');
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }
 
   downloadCV(): void {
     const person = this.person();
+    if (person?.CVUrl) {
+      window.open(person.CVUrl, '_blank');
+      return;
+    }
 
     const rawUrl =
-      person?.CVUrl ||
       'https://drive.google.com/uc?export=download&id=1aZY7sIpRq0v7IAIZd7SLDMUsUWfwOTOc';
 
     const fileIdMatch = rawUrl.match(/[-\w]{25,}/);
@@ -263,6 +276,7 @@ export class PortfolioPage implements OnInit, OnDestroy {
     if (fileIdMatch) {
       const fileId = fileIdMatch[0];
       const downloadUrl = `https://drive.google.com/uc?export=download&id=${fileId}`;
+
 
       const link = document.createElement('a');
       link.href = downloadUrl;
@@ -276,10 +290,6 @@ export class PortfolioPage implements OnInit, OnDestroy {
     } else {
       console.error('No se pudo encontrar un ID de Google Drive válido');
     }
-  }
-
-  goToFeed(): void {
-    this.activeView.set('feed');
   }
 
   nextPage(): void {

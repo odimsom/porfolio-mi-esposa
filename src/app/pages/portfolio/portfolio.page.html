@@ -9,7 +9,7 @@
 
   <div class="grid-layout" [class.mobile-layout]="isMobileWindow()">
     <!-- Section 3: Identity - Left sidebar (spans both rows) -->
-    <section class="section section-identity glass-section" [class.mobile-hidden]="isMobileWindow() && activeMobileSection() !== 'profile'">
+    <section class="section section-identity glass-section" [class.mobile-hidden]="isMobileWindow() && (activeMobileSection() !== 'profile' || activeView() === 'contact')">
       <app-identity-panel
         [person]="person()"
         [currentExperience]="currentExperience()"
@@ -32,7 +32,7 @@
     </section>
 
     <!-- Section 1: Main content area -->
-    <section class="section section-feed glass-section" [class.mobile-hidden]="isMobileWindow() && activeMobileSection() === 'profile'">
+    <section class="section section-feed glass-section" [class.mobile-hidden]="isMobileWindow() && activeMobileSection() === 'profile' && activeView() !== 'contact'">
       @if (activeView() === 'feed') {
         <div class="feed-view fade-in">
           @if (isAdmin()) {
@@ -43,7 +43,7 @@
           }
 
           <div class="feed-grid">
-            @for (item of paginatedItems(); track item.index) {
+            @for (item of paginatedItems(); track $index) {
               <app-feed-card
                 [item]="item"
                 [isAdmin]="isAdmin()"
