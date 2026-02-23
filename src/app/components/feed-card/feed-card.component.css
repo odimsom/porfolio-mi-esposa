@@ -255,3 +255,27 @@
   font-size: 0.55rem;
   padding: 0.1rem 0.4rem;
 }
+
+/* Mobile specific styling for feed cards */
+@media (max-width: 768px) {
+  .feed-card {
+    flex-direction: row;
+    align-items: stretch;
+  }
+  
+  .feed-card__image {
+    width: 130px;
+    height: auto;
+    min-height: 130px;
+    border-right: 1px solid rgba(255, 255, 255, 0.05);
+  }
+  
+  .feed-card__body {
+    padding: 0.6rem;
+    justify-content: center;
+  }
+  
+  .feed-card__title {
+    font-size: 1rem !important;
+  }
+}

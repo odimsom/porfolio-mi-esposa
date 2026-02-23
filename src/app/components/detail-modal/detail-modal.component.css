@@ -108,13 +108,95 @@ option {
   opacity: 0.5;
   cursor: not-allowed;
 }
-.view-content h3 {
+.view-content h3.view-title {
   color: var(--color-text-primary);
-  font-size: 1.5rem;
+  font-size: 1.8rem;
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-family: var(--font-heading);
+}
+.view-subtitle {
+  color: var(--color-accent-primary);
+  font-size: 1.1rem;
+  margin: 0 0 1rem 0;
+  font-weight: 500;
 }
 .view-desc {
   color: var(--color-text-secondary);
-  line-height: 1.6;
+  line-height: 1.7;
+  font-size: 1rem;
+  margin-bottom: 1.5rem;
+}
+.view-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 12px;
+}
+.meta-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+.meta-label {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.meta-value {
+  font-size: 0.95rem;
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+.view-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+.view-tag-chip {
+  background: rgba(116, 185, 255, 0.15);
+  border: 1px solid rgba(116, 185, 255, 0.3);
+  color: #74b9ff;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+}
+.view-links {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+.view-btn {
+  padding: 0.6rem 1.2rem;
+  border-radius: 10px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+  text-align: center;
+}
+.primary-btn {
+  background: var(--color-accent-primary);
+  color: #1a1a1a;
+}
+.primary-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+.secondary-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+.secondary-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
 }
 small {
   color: var(--color-text-muted);

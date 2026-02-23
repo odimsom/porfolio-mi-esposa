@@ -42,6 +42,8 @@ import { PersonService } from '../../services/person.service';
 
 import { AdminActionsComponent } from '../../components/admin-actions/admin-actions.component';
 import { Router } from '@angular/router';
+import { MobileNavComponent, type MobileSection } from '../../components/mobile-nav/mobile-nav';
+import { FloatingActionsComponent } from '../../components/floating-actions/floating-actions.component';
 
 @Component({
   selector: 'app-portfolio',
@@ -57,6 +59,8 @@ import { Router } from '@angular/router';
     DragDropModule,
     DetailModalComponent,
     AdminActionsComponent,
+    MobileNavComponent,
+    FloatingActionsComponent,
   ],
   templateUrl: './portfolio.page.html',
   styleUrl: './portfolio.page.css',
@@ -86,9 +90,17 @@ export class PortfolioPage implements OnInit, OnDestroy {
   person = signal<Person | null>(null);
 
   activeFilter = signal<FeedFilter>('all');
-  searchQuery = signal('');
 
-  readonly ITEMS_PER_PAGE = 4;
+  activeMobileSection = signal<MobileSection>('profile');
+  isMobileWindow = signal<boolean>(false);
+  isTabletWindow = signal<boolean>(false);
+
+  ITEMS_PER_PAGE = computed(() => {
+    if (this.isMobileWindow()) return 3;
+    if (this.isTabletWindow()) return 4;
+    return 6;
+  });
+  
   currentPage = signal(0);
 
   isModalOpen = signal(false);
@@ -110,54 +122,39 @@ export class PortfolioPage implements OnInit, OnDestroy {
 
   feedItems = computed<FeedItem[]>(() => {
     const filter = this.activeFilter();
-    const query = this.searchQuery().toLowerCase().trim();
+    const isMobile = this.isMobileWindow();
+    const mobileSection = this.activeMobileSection();
 
     let items: FeedItem[] = [];
 
-    if (filter === 'all' || filter === 'blogs') {
+    const showBlogs = isMobile ? mobileSection === 'blogs' : (filter === 'all' || filter === 'blogs');
+    const showExperience = isMobile ? mobileSection === 'experience' : (filter === 'all' || filter === 'experience');
+    const showStudies = isMobile ? mobileSection === 'studies' : (filter === 'all' || filter === 'studies');
+    const showProjects = isMobile ? mobileSection === 'projects' : (filter === 'all' || filter === 'projects');
+
+    if (showBlogs) {
       items.push(...this.blogs().map((b: Blog) => ({ ...b, _type: 'blog' as const })));
     }
-    if (filter === 'all' || filter === 'experience') {
+    if (showExperience) {
       items.push(
         ...this.experience().map((e: Experience) => ({ ...e, _type: 'experience' as const })),
       );
     }
-    if (filter === 'all' || filter === 'studies') {
+    if (showStudies) {
       items.push(...this.studies().map((s: Studies) => ({ ...s, _type: 'studies' as const })));
     }
-    if (filter === 'all' || filter === 'projects') {
+    if (showProjects) {
       items.push(...this.projects().map((p: Project) => ({ ...p, _type: 'projects' as const })));
-    }
-    if (query) {
-      items = items.filter((item: FeedItem) => {
-        const searchable = [item.Title.toLowerCase(), item.Descriptions.toLowerCase()];
-        if (item._type === 'blog') {
-          searchable.push(
-            ...(item as Blog & { _type: 'blog' }).Tags.map((t: string) => t.toLowerCase()),
-          );
-        } else if (item._type === 'projects') {
-          searchable.push(
-            ...(item as Project & { _type: 'projects' }).Labels.map((l: string) => l.toLowerCase()),
-          );
-        } else {
-          searchable.push(
-            ...(item as (Experience | Studies) & { _type: string }).Labels.map((l: string) =>
-              l.toLowerCase(),
-            ),
-          );
-        }
-        return searchable.some((s: string) => s.includes(query));
-      });
     }
 
     return items;
   });
 
-  totalPages = computed(() => Math.ceil(this.feedItems().length / this.ITEMS_PER_PAGE));
+  totalPages = computed(() => Math.ceil(this.feedItems().length / this.ITEMS_PER_PAGE()));
 
   paginatedItems = computed(() => {
-    const start = this.currentPage() * this.ITEMS_PER_PAGE;
-    return this.feedItems().slice(start, start + this.ITEMS_PER_PAGE);
+    const start = this.currentPage() * this.ITEMS_PER_PAGE();
+    return this.feedItems().slice(start, start + this.ITEMS_PER_PAGE());
   });
   pageNumbers = computed(() =>
     Array.from({ length: this.totalPages() }, (_: unknown, i: number) => i),
@@ -165,11 +162,21 @@ export class PortfolioPage implements OnInit, OnDestroy {
   location = computed(() => this.person()?.Location ?? 'Guayaquil, Ecuador');
 
   constructor() {
+    if (typeof window !== 'undefined') {
+      this.isMobileWindow.set(window.innerWidth <= 768);
+      this.isTabletWindow.set(window.innerWidth > 768 && window.innerWidth <= 1060);
+      window.addEventListener('resize', () => {
+        this.isMobileWindow.set(window.innerWidth <= 768);
+        this.isTabletWindow.set(window.innerWidth > 768 && window.innerWidth <= 1060);
+      });
+    }
+
     effect(() => {
       this.activeFilter();
-      this.searchQuery();
+      this.activeMobileSection();
+      this.ITEMS_PER_PAGE(); // React to layout changes to reset pagination if needed
       this.currentPage.set(0);
-    });
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit(): void {
@@ -183,25 +190,25 @@ export class PortfolioPage implements OnInit, OnDestroy {
   }
 
   loadData(): void {
-    this.blogService.getAll().subscribe((res) => {
+    this.blogService.getAll().subscribe((res: any) => {
       if (res.success) this.blogs.set(res.data || []);
     });
-    this.experienceService.getAll().subscribe((res) => {
+    this.experienceService.getAll().subscribe((res: any) => {
       if (res.success) this.experience.set(res.data || []);
     });
-    this.studiesService.getAll().subscribe((res) => {
+    this.studiesService.getAll().subscribe((res: any) => {
       if (res.success) this.studies.set(res.data || []);
     });
-    this.projectService.getAll().subscribe((res) => {
+    this.projectService.getAll().subscribe((res: any) => {
       if (res.success) this.projects.set(res.data || []);
     });
-    this.skillService.getAll().subscribe((res) => {
+    this.skillService.getAll().subscribe((res: any) => {
       if (res.success) this.skills.set(res.data || []);
     });
-    this.certificateService.getAll().subscribe((res) => {
+    this.certificateService.getAll().subscribe((res: any) => {
       if (res.success) this.certificates.set(res.data || []);
     });
-    this.personService.getAll().subscribe((res) => {
+    this.personService.getAll().subscribe((res: any) => {
       if (res.success && res.data && res.data.length > 0) {
         this.person.set(res.data[0]);
       }
@@ -236,8 +243,8 @@ export class PortfolioPage implements OnInit, OnDestroy {
     this.activeView.set('feed');
   }
 
-  onSearchChange(query: string): void {
-    this.searchQuery.set(query);
+  onMobileSectionChange(section: MobileSection): void {
+    this.activeMobileSection.set(section);
   }
 
   goToContact(): void {

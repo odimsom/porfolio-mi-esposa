@@ -7,9 +7,9 @@
     </div>
   }
 
-  <div class="grid-layout">
+  <div class="grid-layout" [class.mobile-layout]="isMobileWindow()">
     <!-- Section 3: Identity - Left sidebar (spans both rows) -->
-    <section class="section section-identity glass-section">
+    <section class="section section-identity glass-section" [class.mobile-hidden]="isMobileWindow() && activeMobileSection() !== 'profile'">
       <app-identity-panel
         [person]="person()"
         [currentExperience]="currentExperience()"
@@ -22,18 +22,17 @@
     </section>
 
     <!-- Section 4: Navigation - Top bar -->
-    <section class="section section-nav glass-section">
+    <section class="section section-nav glass-section" [class.mobile-hidden]="isMobileWindow()">
       <app-nav-bar
         [isAdmin]="isAdmin()"
         (filterChange)="onFilterChange($event)"
-        (searchChange)="onSearchChange($event)"
         (contactClick)="goToContact()"
         (downloadCVClick)="downloadCV()"
       />
     </section>
 
     <!-- Section 1: Main content area -->
-    <section class="section section-feed glass-section">
+    <section class="section section-feed glass-section" [class.mobile-hidden]="isMobileWindow() && activeMobileSection() === 'profile'">
       @if (activeView() === 'feed') {
         <div class="feed-view fade-in">
           @if (isAdmin()) {
@@ -168,7 +167,7 @@
     </section>
 
     <!-- Section 5: Skills & Certificates - Right sidebar with auto-rotation -->
-    <section class="section section-sidebar glass-section">
+    <section class="section section-sidebar glass-section" [class.mobile-hidden]="isMobileWindow() && activeMobileSection() !== 'profile'">
       <div
         style="
           display: flex;
@@ -301,6 +300,15 @@
       </div>
     </section>
   </div>
+
+  @if (isMobileWindow()) {
+    <app-mobile-nav (sectionChange)="onMobileSectionChange($event)" />
+  }
+
+  <app-floating-actions 
+    (contactClick)="goToContact()"
+    (downloadCVClick)="downloadCV()"
+  />
 
   <!-- DETAIL MODAL -->
   @if (isModalOpen()) {

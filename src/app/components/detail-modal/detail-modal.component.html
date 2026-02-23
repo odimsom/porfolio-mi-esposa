@@ -223,11 +223,54 @@
     <!-- View Mode -->
     @else {
       <div class="view-content">
-        <!-- Render view content based on type (simplified for now) -->
-        <h3>{{ item()?.Title || item()?.Name }}</h3>
+        <!-- Header Image logic if any -->
+        <h3 class="view-title">{{ item()?.Title || item()?.Name }}</h3>
+        @if (item()?.Company || item()?.University) {
+          <h4 class="view-subtitle">{{ item()?.Company || item()?.University }}</h4>
+        }
+        
         <p class="view-desc">{{ item()?.Descriptions }}</p>
 
-        <!-- Add more specific view details if needed -->
+        <!-- Dynamic properties block -->
+        <div class="view-meta-grid">
+          @if (item()?.Start || item()?.End) {
+            <div class="meta-item">
+              <span class="meta-label">Período</span>
+              <span class="meta-value">{{ item()?.Start }} - {{ item()?.isCurrent ? 'Actualidad' : item()?.End }}</span>
+            </div>
+          }
+          @if (item()?.Location) {
+            <div class="meta-item">
+              <span class="meta-label">Ubicación</span>
+              <span class="meta-value">{{ item()?.Location }}</span>
+            </div>
+          }
+          @if (item()?.Date) {
+            <div class="meta-item">
+              <span class="meta-label">Fecha</span>
+              <span class="meta-value">{{ item()?.Date }}</span>
+            </div>
+          }
+        </div>
+
+        @if (item()?.Labels?.length || item()?.Tags?.length) {
+          <div class="view-tags">
+            @for (tag of (item()?.Labels || item()?.Tags); track $index) {
+              <span class="view-tag-chip">{{ tag }}</span>
+            }
+          </div>
+        }
+
+        @if (item()?.Demo || item()?.Repository) {
+          <div class="view-links">
+            @if (item()?.Demo) {
+              <a [href]="item().Demo" target="_blank" class="view-btn primary-btn">Ver Demo</a>
+            }
+            @if (item()?.Repository) {
+              <a [href]="item().Repository" target="_blank" class="view-btn secondary-btn">Ver Código</a>
+            }
+          </div>
+        }
       </div>
     }
   </div>
