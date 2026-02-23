@@ -1,7 +1,7 @@
 .admin-toolbar {
     position: fixed;
     bottom: 2rem;
-    left: 2rem;
+    right: 2rem;
     z-index: 9998;
     display: flex;
     gap: 0.8rem;
@@ -40,8 +40,10 @@
 /* Mobile FAB overriding */
 @media (max-width: 768px) {
     .admin-toolbar {
-        bottom: 85px; /* Lower position on the flat left side of the nav bar */
-        left: 15px;
+        bottom: 230px; /* Stacked right above the contact & cv fabs */
+        right: 15px;
+        left: auto;
+        flex-direction: column;
     }
 
     .add-btn {
