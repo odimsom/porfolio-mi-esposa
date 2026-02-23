@@ -43,6 +43,7 @@ import { PersonService } from '../../services/person.service';
 import { AdminActionsComponent } from '../../components/admin-actions/admin-actions.component';
 import { Router } from '@angular/router';
 import { MobileNavComponent, type MobileSection } from '../../components/mobile-nav/mobile-nav';
+import { FloatingActionsComponent } from '../../components/floating-actions/floating-actions';
 
 @Component({
   selector: 'app-portfolio',
@@ -59,6 +60,7 @@ import { MobileNavComponent, type MobileSection } from '../../components/mobile-
     DetailModalComponent,
     AdminActionsComponent,
     MobileNavComponent,
+    FloatingActionsComponent,
   ],
   templateUrl: './portfolio.page.html',
   styleUrl: './portfolio.page.css',
@@ -92,6 +94,7 @@ export class PortfolioPage implements OnInit, OnDestroy {
 
   activeMobileSection = signal<MobileSection>('profile');
   isMobileWindow = signal<boolean>(false);
+  isTabletWindow = signal<boolean>(false);
 
   readonly ITEMS_PER_PAGE = 4;
   currentPage = signal(0);
@@ -179,8 +182,10 @@ export class PortfolioPage implements OnInit, OnDestroy {
   constructor() {
     if (typeof window !== 'undefined') {
       this.isMobileWindow.set(window.innerWidth <= 768);
+      this.isTabletWindow.set(window.innerWidth > 768 && window.innerWidth <= 1060);
       window.addEventListener('resize', () => {
         this.isMobileWindow.set(window.innerWidth <= 768);
+        this.isTabletWindow.set(window.innerWidth > 768 && window.innerWidth <= 1060);
       });
     }
 
@@ -203,25 +208,25 @@ export class PortfolioPage implements OnInit, OnDestroy {
   }
 
   loadData(): void {
-    this.blogService.getAll().subscribe((res) => {
+    this.blogService.getAll().subscribe((res: any) => {
       if (res.success) this.blogs.set(res.data || []);
     });
-    this.experienceService.getAll().subscribe((res) => {
+    this.experienceService.getAll().subscribe((res: any) => {
       if (res.success) this.experience.set(res.data || []);
     });
-    this.studiesService.getAll().subscribe((res) => {
+    this.studiesService.getAll().subscribe((res: any) => {
       if (res.success) this.studies.set(res.data || []);
     });
-    this.projectService.getAll().subscribe((res) => {
+    this.projectService.getAll().subscribe((res: any) => {
       if (res.success) this.projects.set(res.data || []);
     });
-    this.skillService.getAll().subscribe((res) => {
+    this.skillService.getAll().subscribe((res: any) => {
       if (res.success) this.skills.set(res.data || []);
     });
-    this.certificateService.getAll().subscribe((res) => {
+    this.certificateService.getAll().subscribe((res: any) => {
       if (res.success) this.certificates.set(res.data || []);
     });
-    this.personService.getAll().subscribe((res) => {
+    this.personService.getAll().subscribe((res: any) => {
       if (res.success && res.data && res.data.length > 0) {
         this.person.set(res.data[0]);
       }

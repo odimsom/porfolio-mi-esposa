@@ -145,6 +145,29 @@
 }
 
 /* ============================================
+   TABLET LAYOUT (769px - 1060px)
+   ============================================ */
+@media (min-width: 769px) and (max-width: 1060px) {
+    .grid-layout {
+        grid-template-columns: 280px 1fr;
+        grid-template-areas:
+            "sidebar nav"
+            "sidebar content"
+            "sidebar skills";
+        grid-template-rows: 80px auto 1fr;
+    }
+    
+    .section-sidebar {
+        grid-area: skills;
+        min-height: 400px;
+    }
+
+    .feed-grid {
+        grid-template-columns: 1fr; /* Single column feed on tablet is often better for readability */
+    }
+}
+
+/* ============================================
    FEED VIEW
    ============================================ */
 
