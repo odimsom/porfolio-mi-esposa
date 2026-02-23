@@ -1,4 +1,4 @@
-import { Component, input, output, effect, inject } from '@angular/core';
+import { Component, input, output, effect, inject, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { DragDropModule } from '@angular/cdk/drag-drop';
@@ -24,6 +24,10 @@ export class DetailModalComponent {
     item = input<any>(null);
     close = output<void>();
     saveItem = output<any>();
+
+    // Gallery State
+    galleryImages = signal<string[]>([]);
+    activeImageIndex = signal<number>(0);
 
     fb = inject(FormBuilder);
     form!: FormGroup;
@@ -52,9 +56,38 @@ export class DetailModalComponent {
         }
     }
 
+    // Gallery Methods
+    setGalleryImage(index: number): void {
+        this.activeImageIndex.set(index);
+    }
+    
+    nextGalleryImage(): void {
+        const current = this.activeImageIndex();
+        const max = this.galleryImages().length - 1;
+        this.activeImageIndex.set(current < max ? current + 1 : 0);
+    }
+
+    prevGalleryImage(): void {
+        const current = this.activeImageIndex();
+        const max = this.galleryImages().length - 1;
+        this.activeImageIndex.set(current > 0 ? current - 1 : max);
+    }
+
     initForm() {
         const item = this.item() || {};
         const type = this.type();
+
+        // Load gallery images for view mode
+        if (this.mode() === 'view') {
+            let urls: string[] = [];
+            if (Array.isArray(item.ImgesUrls)) {
+                urls = item.ImgesUrls;
+            } else if (typeof item.ImgesUrls === 'string') {
+                urls = item.ImgesUrls.split(',').map((u: string) => u.trim()).filter((u: string) => u);
+            }
+            this.galleryImages.set(urls);
+            this.activeImageIndex.set(0);
+        }
 
         // Base fields Common
         let group: any = {

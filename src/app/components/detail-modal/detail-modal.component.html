@@ -223,11 +223,44 @@
     <!-- View Mode -->
     @else {
       <div class="view-content">
-        <!-- Header Image logic if any -->
-        <h3 class="view-title">{{ item()?.Title || item()?.Name }}</h3>
-        @if (item()?.Company || item()?.University) {
-          <h4 class="view-subtitle">{{ item()?.Company || item()?.University }}</h4>
+        <!-- Gallery Header -->
+        @if (galleryImages().length > 0) {
+          <div class="gallery-container">
+            <div class="gallery-main">
+              <img [src]="galleryImages()[activeImageIndex()]" alt="Project snapshot" class="gallery-image" />
+              
+              @if (galleryImages().length > 1) {
+                <button class="gallery-btn prev-btn" (click)="prevGalleryImage()">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                </button>
+                <button class="gallery-btn next-btn" (click)="nextGalleryImage()">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                </button>
+                <div class="gallery-counter">{{ activeImageIndex() + 1 }} / {{ galleryImages().length }}</div>
+              }
+            </div>
+            
+            @if (galleryImages().length > 1) {
+              <div class="gallery-thumbnails">
+                @for (img of galleryImages(); track $index) {
+                  <button 
+                    class="thumbnail-btn" 
+                    [class.active]="activeImageIndex() === $index"
+                    (click)="setGalleryImage($index)">
+                    <img [src]="img" alt="Thumbnail" />
+                  </button>
+                }
+              </div>
+            }
+          </div>
         }
+
+        <div class="view-header-text">
+          <h3 class="view-title">{{ item()?.Title || item()?.Name }}</h3>
+          @if (item()?.Company || item()?.University) {
+            <h4 class="view-subtitle">{{ item()?.Company || item()?.University }}</h4>
+          }
+        </div>
         
         <p class="view-desc">{{ item()?.Descriptions }}</p>
 
@@ -254,20 +287,29 @@
         </div>
 
         @if (item()?.Labels?.length || item()?.Tags?.length) {
-          <div class="view-tags">
-            @for (tag of (item()?.Labels || item()?.Tags); track $index) {
-              <span class="view-tag-chip">{{ tag }}</span>
-            }
+          <div class="view-tags-modern">
+            <h4 class="tags-header">Tecnologías</h4>
+            <div class="tags-list">
+              @for (tag of (item()?.Labels || item()?.Tags); track $index) {
+                <span class="modern-badge">{{ tag }}</span>
+              }
+            </div>
           </div>
         }
 
         @if (item()?.Demo || item()?.Repository) {
           <div class="view-links">
             @if (item()?.Demo) {
-              <a [href]="item().Demo" target="_blank" class="view-btn primary-btn">Ver Demo</a>
+              <a [href]="item().Demo" target="_blank" class="view-btn primary-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                Ver Demo
+              </a>
             }
             @if (item()?.Repository) {
-              <a [href]="item().Repository" target="_blank" class="view-btn secondary-btn">Ver Código</a>
+              <a [href]="item().Repository" target="_blank" class="view-btn secondary-btn">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                Código Fuente
+              </a>
             }
           </div>
         }
