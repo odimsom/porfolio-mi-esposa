@@ -90,13 +90,17 @@ export class PortfolioPage implements OnInit, OnDestroy {
   person = signal<Person | null>(null);
 
   activeFilter = signal<FeedFilter>('all');
-  searchQuery = signal('');
 
   activeMobileSection = signal<MobileSection>('profile');
   isMobileWindow = signal<boolean>(false);
   isTabletWindow = signal<boolean>(false);
 
-  readonly ITEMS_PER_PAGE = 4;
+  ITEMS_PER_PAGE = computed(() => {
+    if (this.isMobileWindow()) return 3;
+    if (this.isTabletWindow()) return 4;
+    return 6;
+  });
+  
   currentPage = signal(0);
 
   isModalOpen = signal(false);
@@ -118,7 +122,6 @@ export class PortfolioPage implements OnInit, OnDestroy {
 
   feedItems = computed<FeedItem[]>(() => {
     const filter = this.activeFilter();
-    const query = this.searchQuery().toLowerCase().trim();
     const isMobile = this.isMobileWindow();
     const mobileSection = this.activeMobileSection();
 
@@ -143,36 +146,15 @@ export class PortfolioPage implements OnInit, OnDestroy {
     if (showProjects) {
       items.push(...this.projects().map((p: Project) => ({ ...p, _type: 'projects' as const })));
     }
-    if (query) {
-      items = items.filter((item: FeedItem) => {
-        const searchable = [item.Title.toLowerCase(), item.Descriptions.toLowerCase()];
-        if (item._type === 'blog') {
-          searchable.push(
-            ...(item as Blog & { _type: 'blog' }).Tags.map((t: string) => t.toLowerCase()),
-          );
-        } else if (item._type === 'projects') {
-          searchable.push(
-            ...(item as Project & { _type: 'projects' }).Labels.map((l: string) => l.toLowerCase()),
-          );
-        } else {
-          searchable.push(
-            ...(item as (Experience | Studies) & { _type: string }).Labels.map((l: string) =>
-              l.toLowerCase(),
-            ),
-          );
-        }
-        return searchable.some((s: string) => s.includes(query));
-      });
-    }
 
     return items;
   });
 
-  totalPages = computed(() => Math.ceil(this.feedItems().length / this.ITEMS_PER_PAGE));
+  totalPages = computed(() => Math.ceil(this.feedItems().length / this.ITEMS_PER_PAGE()));
 
   paginatedItems = computed(() => {
-    const start = this.currentPage() * this.ITEMS_PER_PAGE;
-    return this.feedItems().slice(start, start + this.ITEMS_PER_PAGE);
+    const start = this.currentPage() * this.ITEMS_PER_PAGE();
+    return this.feedItems().slice(start, start + this.ITEMS_PER_PAGE());
   });
   pageNumbers = computed(() =>
     Array.from({ length: this.totalPages() }, (_: unknown, i: number) => i),
@@ -191,10 +173,10 @@ export class PortfolioPage implements OnInit, OnDestroy {
 
     effect(() => {
       this.activeFilter();
-      this.searchQuery();
       this.activeMobileSection();
+      this.ITEMS_PER_PAGE(); // React to layout changes to reset pagination if needed
       this.currentPage.set(0);
-    });
+    }, { allowSignalWrites: true });
   }
 
   ngOnInit(): void {
@@ -259,10 +241,6 @@ export class PortfolioPage implements OnInit, OnDestroy {
   onFilterChange(filter: FeedFilter): void {
     this.activeFilter.set(filter);
     this.activeView.set('feed');
-  }
-
-  onSearchChange(query: string): void {
-    this.searchQuery.set(query);
   }
 
   onMobileSectionChange(section: MobileSection): void {
