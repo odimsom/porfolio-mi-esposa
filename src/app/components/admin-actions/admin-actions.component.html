@@ -1,8 +1,38 @@
 <div class="admin-toolbar">
-     @if (showBlog()) { <button class="add-btn" (click)="create.emit('blog')">+ Blog</button> }
-     @if (showProject()) { <button class="add-btn" (click)="create.emit('project')">+ Project</button> }
-     @if (showExperience()) { <button class="add-btn" (click)="create.emit('experience')">+ Exp</button> }
-     @if (showStudies()) { <button class="add-btn" (click)="create.emit('studies')">+ Edu</button> }
-     @if (showSkills()) { <button class="add-btn" (click)="create.emit('skill')">+ Skill</button> }
-     @if (showCertificates()) { <button class="add-btn" (click)="create.emit('certificate')">+ Cert</button> }
+  @if (showBlog()) {
+    <button class="add-btn" (click)="create.emit('blog')" title="Añadir Blog">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" class="add-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      <span class="add-text">Blog</span>
+    </button>
+  }
+  @if (showProject()) {
+    <button class="add-btn" (click)="create.emit('project')" title="Añadir Proyecto">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" class="add-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      <span class="add-text">Proyecto</span>
+    </button>
+  }
+  @if (showExperience()) {
+    <button class="add-btn" (click)="create.emit('experience')" title="Añadir Experiencia">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" class="add-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      <span class="add-text">Experiencia</span>
+    </button>
+  }
+  @if (showStudies()) {
+    <button class="add-btn" (click)="create.emit('studies')" title="Añadir Estudios">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" class="add-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      <span class="add-text">Estudios</span>
+    </button>
+  }
+  @if (showSkills()) {
+    <button class="add-btn" (click)="create.emit('skill')" title="Añadir Habilidad">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" class="add-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      <span class="add-text">Habilidad</span>
+    </button>
+  }
+  @if (showCertificates()) {
+    <button class="add-btn" (click)="create.emit('certificate')" title="Añadir Certificado">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" class="add-icon" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+      <span class="add-text">Certificado</span>
+    </button>
+  }
 </div>

@@ -1,11 +1,12 @@
 .admin-toolbar {
-    position: absolute;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    z-index: 100;
+    position: fixed;
+    bottom: 2rem;
+    left: 2rem;
+    z-index: 9998;
     display: flex;
     gap: 0.8rem;
 }
+
 .add-btn {
     background: rgba(116, 185, 255, 0.15);
     border: 1px solid rgba(116, 185, 255, 0.3);
@@ -16,13 +17,14 @@
     font-weight: 600;
     font-size: 0.9rem;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     display: flex;
     align-items: center;
     gap: 0.5rem;
     box-shadow: 0 4px 15px rgba(116, 185, 255, 0.1);
     backdrop-filter: blur(5px);
 }
+
 .add-btn:hover {
     background: rgba(116, 185, 255, 0.25);
     transform: translateY(-2px);
@@ -30,6 +32,42 @@
     border-color: rgba(116, 185, 255, 0.5);
     color: white;
 }
+
 .add-btn:active {
     transform: translateY(0);
+}
+
+/* Mobile FAB overriding */
+@media (max-width: 768px) {
+    .admin-toolbar {
+        bottom: 110px; /* Right above the mobile app bar */
+        left: 15px;
+    }
+
+    .add-btn {
+        width: 50px;
+        height: 50px;
+        padding: 0;
+        border-radius: 50%;
+        justify-content: center;
+        background: transparent;
+        border: 2px solid #ff793f;
+        color: #ff793f;
+        box-shadow: 0 4px 15px rgba(255, 121, 63, 0.3);
+    }
+
+    .add-btn:hover {
+        background: rgba(255, 121, 63, 0.15);
+        border-color: #ff9f43;
+        color: #ff9f43;
+        box-shadow: 0 6px 20px rgba(255, 121, 63, 0.4);
+    }
+
+    .add-text {
+        display: none;
+    }
+
+    .add-icon {
+        margin: 0;
+    }
 }
